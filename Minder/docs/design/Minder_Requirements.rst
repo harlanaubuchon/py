@@ -70,12 +70,23 @@ Requirements
 6. **Discovery**
     1. Provide a server and client mechanism that is aware of other Minder Nodes on the LAN.
      
+
 Dependencies
 ------------
+
+Standard Library
+
 * watchdog [PyYAML [LibYAML]]
 * argh
 * pathtools
+* mimetypes
+* hashlib
+
+3rd Party Libraries
+
 * paramiko
+* git
+
 
 Risks
 -----
@@ -90,4 +101,8 @@ User Acceptance Criteria
 2. As a Photographer, I want my RAW Photos stored in a "Pictures/RAW" folder when I insert my compact flash card in my computer.
 
 3. As a Photographer, I want a version created for each RAW photo so I can always revert to it at any point in time.
+
+4. As a User I want Minder to stop if it gets too close to a threshold I set for space remaining in a configured folder.
+
+5. As a User I want Minder to find binary duplicate files in a particular folder and ensure that only one copy exists.
     

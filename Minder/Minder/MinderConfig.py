@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import ConfigParser, os
+import ConfigParser
+import os
 from sys import platform
 
 ## Change USER_DIRECTORY to '~' for *nix and M$ or 
@@ -8,9 +9,9 @@ from sys import platform
 ## Change SYSTEM to sys.platform for *nix and M$ or 'ANDROID' for Android
 
 CURRENT_DIRECTORY = os.getcwd()
-USER_DIRECTORY = os.path.expanduser('~')  
+USER_DIRECTORY = os.path.expanduser('~')
 parser = ConfigParser.ConfigParser()
-SYSTEM = platform  
+SYSTEM = platform
 MINDER_CONFIG_FILE = 'minder_config.ini'
 MINDER_HOME = USER_DIRECTORY + '/.Minder/'
 M_PATH = MINDER_HOME + MINDER_CONFIG_FILE
@@ -18,16 +19,15 @@ M_PATH = MINDER_HOME + MINDER_CONFIG_FILE
 M_CONFIG = {}
 
 DEFAULT_CONFIG = {
-                    "defaults": {
-                        "space_remaining_threshold_bytes": 2048,
-                        "text_difference_threshold_percentage": 99,
-                        },
-                    
-                    "minds": {
-                        }
-                }
+                     "defaults": {
+                         "space_remaining_threshold_bytes": 2048,
+                         "text_difference_threshold_percentage": 99,
+                         },
+                     "minds": {}
+                     }
 
-def minderConfig():
+
+def minderconfig():
     """ 
     Minder Config returns the Minder config file parsed as a dictionary.  If 
     the initial read fails minderConfig assumes this is a new install or 
@@ -44,15 +44,15 @@ def minderConfig():
         print 'New Minder install...  Creating Minder Home.'
         os.makedirs(MINDER_HOME)
         _write_minder_config(DEFAULT_CONFIG)
-        print 'Created Minder Home at %s' %M_PATH
-    
+        print 'Created Minder Home at %s' % M_PATH
+
     minder_config = _read_minder_config()
-    
+
     return minder_config
 
 
 def _read_minder_config():
-    if os.path.isfile(M_PATH) == True:
+    if os.path.isfile(M_PATH):
         parser.read(M_PATH)
         section_list = parser.sections()
 
@@ -63,9 +63,9 @@ def _read_minder_config():
 
     else:
         raise OSError
-    
+
     return M_CONFIG
-    
+
 
 def _write_minder_config(minder_config):
     section_list = minder_config.keys()
@@ -74,12 +74,13 @@ def _write_minder_config(minder_config):
         parser.add_section(section)
         for key in minder_config[section].keys():
             parser.set(section, key, minder_config[section][key])
-    
+
     with open(M_PATH, 'w') as file_handle:
         parser.write(file_handle)
-
+        print 'Writing Minder Config'
 
 if __name__ == "__main__":
-    minderConfig()
-
+    config = minderconfig()
+    for item in config.keys():
+        print item, config[item]
 

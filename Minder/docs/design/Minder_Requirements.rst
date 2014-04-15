@@ -66,20 +66,43 @@ Requirements
 5. **Security**
     1. Encryption
         1. SSH2 (Busybox/Python) will be used to create keypairs for all local and remote connections.
-    
 
-Optional
---------
-
-5. Discovery
-   Provide a server and client mechanism that is aware of other Minder Nodes on the LAN.
-
+6. **Discovery**
+    1. Provide a server and client mechanism that is aware of other Minder Nodes on the LAN.
+     
 
 Dependencies
 ------------
+
+Standard Library
+
+* watchdog [PyYAML [LibYAML]]
+* argh
+* pathtools
+* mimetypes
+* hashlib
+
+3rd Party Libraries
+
+* paramiko
+* git
+
 
 Risks
 -----
 
 QA Test Plan
 ------------
+
+User Acceptance Criteria
+
+1. As a Mobile Device User, I want the pictures I take with my mobile device to be stored in a "Pictures" folder and re-named to something meaningful to me.
+
+2. As a Photographer, I want my RAW Photos stored in a "Pictures/RAW" folder when I insert my compact flash card in my computer.
+
+3. As a Photographer, I want a version created for each RAW photo so I can always revert to it at any point in time.
+
+4. As a User I want Minder to stop if it gets too close to a threshold I set for space remaining in a configured folder.
+
+5. As a User I want Minder to find binary duplicate files in a particular folder and ensure that only one copy exists.
+    

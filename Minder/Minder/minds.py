@@ -9,7 +9,7 @@ import json
 from collections import namedtuple
 
 MIND_DIR = '/.mind'
-MIND = '/mind_palace'
+MIND = '/mind_palace.json'
 MIND_FILE = MIND_DIR + MIND
 #null = None
 
@@ -30,44 +30,34 @@ def mind(mind_path):
     return mind_palace
 
 
-def interrogate(mind_path, mind_dir):
+def interrogate(rootdir, mind_dir):
     """
-    Creates a nested dictionary within mind_dir that represents the folder structure of
-    mind_path.
+    Created by Andrew Clark on Mon, 26 Sep 2011 (MIT)
+    Creates a nested dictionary that represents the folder structure of rootdir
     """
-    start = mind_path.rfind(os.sep) + 1
+    dir = {}
+    rootdir = rootdir.rstrip(os.sep)
+    start = rootdir.rfind(os.sep) + 1
+    for path, dirs, files in os.walk(rootdir):
+        folders = path[start:].split(os.sep)
+        subdir = dict.fromkeys(files)
+        if len(files) > 0:
+            for file_name in files:
+                with open(path + '/' + file_name) as file_handle:
+                    file_data = file_handle.read()
+                    checksum = hashlib.md5(file_data).hexdigest()
+                    subdir[file_name] = {"md5_sum": checksum, "mime_type": None}
+        parent = reduce(dict.get, folders[:-1], dir)
+        parent[folders[-1]] = subdir
 
-    for dir_name, dirs, files in os.walk(mind_path):
-        folders = dir_name[start:].split(os.sep)
-        sub_dir = dict.fromkeys(files)
+    dir_key = dir.keys()[0]
+    mind_dir[rootdir][dir_key] = dir[dir_key]
 
-        parent = reduce(dict.get, folders[:-1], mind_dir[mind_path])
-        parent[folders[-1]] = sub_dir
-
-    """
-    for (dir_name, dirs, files) in os.walk(path):
-        for dirs_name in dirs:
-            counter = 0
-            if dirs_name.startswith('.'):
-                print 'found a . in %s - removing from list' %dirs_name
-                dirs.pop(counter)
-            counter += 1
-
-        for file_name in files:
-            if filename[0] != '.':
-                thefile = os.path.join(dir_name,file_name)
-                file_handle = open(thefile,'r')
-                file_data = file_handle.read()
-                file_handle.close()
-                checksum = hashlib.md5(file_data).hexdigest()
-                file_dict[checksum] = thefile
-                print os.path.getsize(thefile), thefile, checksum
-    """
     return mind_dir
 
 
 def _write_mind_palace(mind_path, mind_palace):
-    je = json.JSONEncoder(indent=4, sort_keys=True)
+    je = json.JSONEncoder(indent=4, sort_keys=True, encoding="utf-8")
     file_path = mind_path + MIND_FILE  # Replace this with Class attribute
     with open(file_path, 'w') as write_handle:
         json_dir = je.encode(mind_palace)
@@ -76,7 +66,7 @@ def _write_mind_palace(mind_path, mind_palace):
 
 
 def _read_mind_palace(mind_path):
-    jd = json.JSONDecoder()
+    jd = json.JSONDecoder(encoding="utf-8")
     file_path = mind_path + MIND_FILE  # Replace this with Class attribute
     with open(file_path) as read_handle:
         json_string = read_handle.read()

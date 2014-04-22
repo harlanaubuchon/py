@@ -4,14 +4,12 @@ import os
 from datetime import datetime
 import time
 import hashlib
-import pprint
 import json
-from collections import namedtuple
+
 
 MIND_DIR = '/.mind'
 MIND = '/mind_palace.json'
 MIND_FILE = MIND_DIR + MIND
-#null = None
 
 
 def mind(mind_path):
@@ -33,6 +31,7 @@ def mind(mind_path):
 def interrogate(rootdir, mind_dir):
     """
     Created by Andrew Clark on Mon, 26 Sep 2011 (MIT)
+    http://code.activestate.com/recipes/577879-create-a-nested-dictionary-from-oswalk/
     Creates a nested dictionary that represents the folder structure of rootdir
     """
     dir = {}

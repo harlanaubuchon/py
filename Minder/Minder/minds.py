@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 __author__ = 'harlanaubuchon'
 
 import os
@@ -5,6 +6,7 @@ from datetime import datetime
 import time
 import hashlib
 import json
+from functools import reduce
 
 
 MIND_DIR = '/.mind'
@@ -13,6 +15,13 @@ MIND_FILE = MIND_DIR + MIND
 
 
 def mind(mind_path, refresh=False):
+    """ 
+    Minds returns a JSON Data object representing the file structure and some 
+    useful meta-data about the files for the path given.  An optional argument
+    refresh=True can be used to re-save the mind_palace.json file to the .mind 
+    directory.
+    """
+
     file_path = mind_path + MIND_FILE  # Replace this with Class attribute
     mind_time = datetime.fromtimestamp(time.time()).isoformat()[:23] + 'Z'
     mind_dir = {mind_path: {"minded_datetime": mind_time}}

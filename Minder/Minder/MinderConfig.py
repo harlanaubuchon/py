@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+__author__ = 'harlanaubuchon'
 
 import ConfigParser
 import os
@@ -16,8 +17,10 @@ MINDER_CONFIG_FILE = 'minder_config.ini'
 MINDER_HOME = USER_DIRECTORY + '/.Minder/'
 M_PATH = MINDER_HOME + MINDER_CONFIG_FILE
 
+# I know this isn't a constant
 M_CONFIG = {}
 
+# I might move this to a "defaults" module
 DEFAULT_CONFIG = {
                      "defaults": {
                          "space_remaining_threshold_bytes": 2048,

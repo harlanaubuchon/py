@@ -4,6 +4,7 @@ __author__ = 'harlanaubuchon'
 import ConfigParser
 import os
 from sys import platform
+import Minder.minder_defaults
 
 ## Change USER_DIRECTORY to '~' for *nix and M$ or 
 ## overwrite function with '/sdcard' for Android
@@ -16,18 +17,7 @@ SYSTEM = platform
 MINDER_CONFIG_FILE = 'minder_config.ini'
 MINDER_HOME = USER_DIRECTORY + '/.Minder/'
 M_PATH = MINDER_HOME + MINDER_CONFIG_FILE
-
-# I know this isn't a constant
 M_CONFIG = {}
-
-# I might move this to a "defaults" module
-DEFAULT_CONFIG = {
-                     "defaults": {
-                         "space_remaining_threshold_bytes": 2048,
-                         "text_difference_threshold_percentage": 99,
-                         },
-                     "minds": {}
-                     }
 
 
 def minderconfig():
@@ -46,7 +36,7 @@ def minderconfig():
     except OSError:
         print 'New Minder install...  Creating Minder Home.'
         os.makedirs(MINDER_HOME)
-        _write_minder_config(DEFAULT_CONFIG)
+        _write_minder_config(Minder.minder_defaults.DEFAULT_CONFIG)
         print 'Created Minder Home at %s' % M_PATH
 
     minder_config = _read_minder_config()

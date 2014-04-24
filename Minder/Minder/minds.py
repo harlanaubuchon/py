@@ -6,6 +6,7 @@ from datetime import datetime
 import time
 import hashlib
 import json
+import mimetypes
 from functools import reduce
 
 
@@ -29,6 +30,7 @@ def mind(mind_path, refresh=False):
     if os.path.isfile(file_path):
         if refresh is True:
             mind_palace = interrogate(mind_path, mind_dir)
+            _write_mind_palace(mind_path, mind_palace)
         else:
             mind_palace = _read_mind_palace(mind_path)
     else:
@@ -58,7 +60,8 @@ def interrogate(mind_path, mind_dir):
                 with open(path + '/' + file_name) as file_handle:
                     file_data = file_handle.read()
                     checksum = hashlib.md5(file_data).hexdigest()
-                    subdir[file_name] = {"md5_sum": checksum, "mime_type": None}
+                    mime_type = mimetypes.guess_type(file_name)[0].split('/')
+                    subdir[file_name] = {"md5_sum": checksum, "mime_type": mime_type}
         parent = reduce(dict.get, folders[:-1], file_dir)
         parent[folders[-1]] = subdir
 

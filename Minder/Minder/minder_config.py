@@ -4,7 +4,7 @@ __author__ = 'harlanaubuchon'
 import ConfigParser
 import os
 from sys import platform
-import Minder.minder_defaults
+import minder_defaults
 
 ## Change USER_DIRECTORY to '~' for *nix and M$ or 
 ## overwrite function with '/sdcard' for Android
@@ -15,8 +15,8 @@ USER_DIRECTORY = os.path.expanduser('~')
 parser = ConfigParser.ConfigParser()
 SYSTEM = platform
 MINDER_CONFIG_FILE = 'minder_config.ini'
-MINDER_HOME = USER_DIRECTORY + '/.Minder/'
-M_PATH = MINDER_HOME + MINDER_CONFIG_FILE
+MINDER_HOME = os.path.join(USER_DIRECTORY, '.Minder')
+M_PATH = os.path.join(MINDER_HOME, MINDER_CONFIG_FILE)
 M_CONFIG = {}
 
 
@@ -34,9 +34,10 @@ def minderconfig():
         print 'Reading Minder Config'
 
     except OSError:
-        print 'New Minder install...  Creating Minder Home.'
-        os.makedirs(MINDER_HOME)
-        _write_minder_config(Minder.minder_defaults.DEFAULT_CONFIG)
+        if os.path.isdir(MINDER_HOME) is False:
+            print 'New Minder install...  Creating Minder Home.'
+            os.makedirs(MINDER_HOME)
+        _write_minder_config(minder_defaults.DEFAULT_CONFIG)
         print 'Created Minder Home at %s' % M_PATH
 
     minder_config = _read_minder_config()

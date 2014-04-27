@@ -64,7 +64,6 @@ def interrogate(mind_path, mind_dir):
                 file_path = os.path.join(path, file_name)
                 file_size = int(os.path.getsize(file_path) / 1024)
                 if file_size < size_limit:
-                    print "%s - %s < %s - %s" % (type(file_size), file_size, type(size_limit), size_limit)
                     with open(file_path) as file_handle:
                         file_data = file_handle.read()
                         checksum = hashlib.md5(file_data).hexdigest()
@@ -76,7 +75,6 @@ def interrogate(mind_path, mind_dir):
                     mime_type = guess_mime[0].split('/')
                 else:
                     mime_type = None
-                    #print guess_mime
                     
                 subdir[file_name] = {"md5_sum": checksum, "mime_type": mime_type, "file_size": file_size}
 

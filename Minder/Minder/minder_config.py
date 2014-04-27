@@ -64,10 +64,15 @@ def _read_minder_config():
 def _write_minder_config(minder_config):
     section_list = minder_config.keys()
 
-    for section in section_list:
-        parser.add_section(section)
-        for key in minder_config[section].keys():
-            parser.set(section, key, minder_config[section][key])
+    if os.path.isfile(M_PATH) is False:
+        for section in section_list:
+            parser.add_section(section)
+            for key in minder_config[section].keys():
+                parser.set(section, key, minder_config[section][key])
+    else:
+        for section in section_list:
+            for key in minder_config[section].keys():
+                parser.set(section, key, minder_config[section][key])
 
     with open(M_PATH, 'w') as file_handle:
         parser.write(file_handle)

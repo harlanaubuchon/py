@@ -1,0 +1,145 @@
+body {
+font-family:"Open Sans",Arial,sans-serif;
+font-size:14px;
+line-height:1.42857143;
+color:#CCC;
+background-color:#333;
+margin:0;
+}
+
+.jumbotron {
+padding: 30px;
+margin-bottom: 30px;
+color: #999;
+background-color: #333;
+}
+
+mark {
+background:#ff0;
+color:#333;
+}
+
+.form-control {
+display:block;
+width:100%;
+height:34px;
+font-size:14px;
+line-height:1.42857143;
+color:#EEE;
+background-color:#777;
+background-image:none;
+border:1px solid #222;
+border-radius:4px;
+-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);
+box-shadow:inset 0 1px 1px rgba(0,0,0,.075);
+-webkit-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+padding:6px 12px;
+}
+
+.input-group[class*="col-"] {
+    float: left;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.input-group-addon {
+padding: 6px 12px;
+font-size: 14px;
+font-weight: 400;
+line-height: 1;
+color: #CCC;
+text-align: center;
+background-color: #555;
+border: 1px solid #222;
+border-radius: 4px;
+}
+
+.input-group-addon, .input-group-btn {
+width: 100px;
+white-space: nowrap;
+vertical-align: middle;
+}
+
+legend {
+display: block;
+width: 100%;
+padding: 0;
+margin-bottom: 20px;
+font-size: 21px;
+line-height: inherit;
+color: #999;
+border: 0;
+border-bottom: 1px solid #e5e5e5;
+}
+.navbar {
+position: relative;
+}
+
+.navbar-inverse {
+background-color:#222;
+border-color:#080808;
+}
+
+.navbar-inverse
+.navbar-nav>.active>a,.navbar-inverse
+.navbar-nav>.active>a:hover,.navbar-inverse
+.navbar-nav>.active>a:focus {
+color:#fff;
+background-color:#3276b1;
+}
+
+.navbar-inverse
+.navbar-nav>.disabled>a,.navbar-inverse
+.navbar-nav>.disabled>a:hover,.navbar-inverse
+.navbar-nav>.disabled>a:focus {
+color:#444;
+background-color:transparent;
+}
+
+.navbar-inverse
+.navbar-toggle {
+border-color:#333;
+}
+
+.navbar-inverse
+.navbar-toggle:hover,.navbar-inverse
+.navbar-toggle:focus {
+background-color:#333;
+}
+
+.navbar-inverse .navbar-collapse,.navbar-inverse
+.navbar-form {
+border-color:#101010;
+}
+
+.navbar-inverse
+.navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a:hover,.navbar-inverse
+.navbar-nav>.open>a:focus {
+background-color:#080808;
+color:#fff;
+}
+
+.navbar-inverse
+.navbar-link:hover {
+color:#fff;
+}
+
+.breadcrumb {
+margin-bottom:20px;
+list-style:none;
+background-color:#333;
+border-radius:4px;
+padding:8px 15px;
+}
+
+.breadcrumb>li {
+display:inline-block;
+}
+
+.breadcrumb>li+li:before {
+content:"/\00a0";
+color:#ccc;
+padding:0 5px;
+}
+

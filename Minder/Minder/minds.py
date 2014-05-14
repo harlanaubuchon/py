@@ -17,6 +17,17 @@ MIND_FILE = os.path.join(MIND_DIR, MIND)
 USER_DIR = os.path.expanduser('~')
 M_CONFIG = mc.minderconfig()
 
+
+def _init_mindtypes():
+    mind_types = {}
+    for i in mimetypes.types_map.keys():
+        k = mimetypes.types_map[i].split('/')[0]
+        mind_types.setdefault(k, {})
+        mind_types[k][i] = mimetypes.types_map[i]
+    return mind_types
+
+mindtypes = _init_mindtypes()
+
 def mind(mind_path, refresh=False):
     """ 
     Minds returns a JSON Data object representing the file structure and some 
@@ -103,3 +114,7 @@ def _read_mind_palace(mind_path):
         json_dir = jd.decode(json_string)
 
     return json_dir
+
+if __name__ == "__main__":
+    m = mind('/home/nykhedimus/x')
+    print m

@@ -26,8 +26,10 @@ main_template = """<!DOCTYPE html>
     <!-- Bootstrap core CSS -->
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/bootstrap.override.css" rel="stylesheet">
+
     <!-- Custom styles for this template -->
     <link rel="stylesheet" type="text/css" href="./css/css-ninja-styles.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
     <!--<link href="navbar-fixed-top.css" rel="stylesheet">-->
 
     <!-- Just for debugging purposes. Don't actually copy this line! -->
@@ -50,7 +52,7 @@ main_template = """<!DOCTYPE html>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Minder</a>
+          <a class="navbar-brand" href="/index.html">Minder</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -112,7 +114,7 @@ settings = """
 form_group = """
 <div class="form-group">
     <label for="${type}" class="col-sm-4 control-label">${label}</label>
-    <div class="col-sm-4 input-group">
+    <div class="col-sm-6 input-group">
         <input type="${type}" class="form-control" id="${type}" name="${key}" placeholder="${value}">
         <span class="input-group-addon">${uom}</span>
     </div>

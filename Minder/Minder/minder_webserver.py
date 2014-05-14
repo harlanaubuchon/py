@@ -11,26 +11,27 @@ import mimetypes
 
 HOST_NAME = ''
 PORT_NUMBER = 8051
-
-d = {'index': 'md.index',
+CUR_DIR = os.getcwd()
+WEBROOT = os.path.join(CUR_DIR, 'webroot')
+methods_list = {'index': 'md.index',
      'settings': 'expand_settings()',
      'minds': 'md.minds',
      'remotes': 'md.remotes'}
 
-CUR_DIR = os.getcwd()
-WEBROOT = os.path.join(CUR_DIR, 'webroot')
 
-# parameters: [title (String), navbar_active[key], main_container(content)]
 def get_template(path_name=None):
+    """Parameters: [title (String), navbar_active[key],
+    main_container(content)]"""
     sd = {}
     p = path_name.split('.')[0]
     print p
     sd['title'] = p
     sd['navbar_active'] = md.navbar_active[p]
-    sd['main_container'] = eval(d[p])
+    sd['main_container'] = eval(methods_list[p])
     t = Template(md.main_template)
     html_string = t.substitute(sd)
     return html_string
+
 
 def expand_settings():
     config_dict = json.loads(md.config)
@@ -45,6 +46,7 @@ def expand_settings():
         final_html += st.substitute(form_builder)
     return final_html
 
+
 def get_file(file_name):
     f = open(WEBROOT + file_name)
     file_string = f.read()
@@ -52,12 +54,14 @@ def get_file(file_name):
     f.close()
     return [m[0], file_string]
 
+
 class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_HEAD(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
+
 
     def do_GET(self):
         try:
@@ -79,6 +83,7 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_response(404)
             self.send_header("Content-type", 0)
             self.end_headers()
+
 
     def do_POST(self):
         self.send_response(200)

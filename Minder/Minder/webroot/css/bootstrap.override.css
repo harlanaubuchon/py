@@ -7,8 +7,27 @@ background-color:#333;
 margin:0;
 }
 
-.custom > li > a:hover {
-background-color: #3276b1;
+.btn-lg, .btn-group-lg>.btn {
+padding: 10px 16px;
+font-size: 16px;
+line-height: 1.33;
+border-radius: 0px;
+}
+
+.btn {
+display: inline-block;
+margin-bottom: 0;
+font-weight: 400;
+text-align: center;
+vertical-align: middle;
+cursor: pointer;
+background-image: none;
+border: 1px solid transparent;
+white-space: nowrap;
+padding: 6px 12px;
+font-size: 16px;
+line-height: 1.42857143;
+border-radius: 0px;
 }
 
 .jumbotron {
@@ -45,6 +64,7 @@ padding:6px 12px;
     float: left;
     padding-right: 15px;
     padding-left: 15px;
+    color: red;
 }
 
 .input-group-addon {
@@ -56,11 +76,15 @@ color: #CCC;
 text-align: center;
 background-color: #555;
 border: 1px solid #222;
-border-radius: 4px;
+border-radius: 0px;
+border-top-left-radius: 0px;
+border-top-right-radius: 0px;
+border-bottom-right-radius: 0px;
+border-bottom-left-radius: 0px;
 }
 
 .input-group-addon, .input-group-btn {
-width: 100px;
+width: 120px;
 white-space: nowrap;
 vertical-align: middle;
 }
@@ -70,7 +94,7 @@ display: block;
 width: 100%;
 padding: 0;
 margin-bottom: 20px;
-font-size: 21px;
+font-size: 20px;
 line-height: inherit;
 color: #CCC;
 border: 0;
@@ -78,6 +102,11 @@ border-bottom: 1px solid #B93535;
 }
 .navbar {
 position: relative;
+}
+
+.navbar-inverse .navbar-nav>li>a:hover, .navbar-inverse .navbar-nav>li>a:focus {
+color: #fff;
+background-color: #3276b1;
 }
 
 .navbar-inverse {
@@ -133,7 +162,7 @@ color:#fff;
 margin-bottom:20px;
 list-style:none;
 background-color:#333;
-border-radius:4px;
+border-radius:0px;
 padding:8px 15px;
 }
 

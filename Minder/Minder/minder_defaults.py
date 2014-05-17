@@ -59,6 +59,11 @@ main_template = """<!DOCTYPE html>
             ${navbar_active}
           </ul>
         </div><!--/.nav-collapse -->
+      <ol class="breadcrumb">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Library</a></li>
+          <li class="active">Data</li>
+      </ol>
       </div>
       <div class="container theme-showcase" role="main">
         ${main_container}
@@ -145,15 +150,15 @@ minds = """
 <p>This is the minds page.</p>
 	<ol class="tree">
 		<li class="tree">
-			<label for="folder2">Folder 2</label> <input type="checkbox" id="folder2" />
+			<label for="folder2">Folder_1</label> <input type="checkbox" id="folder" />
 			<ol>
-				<li class="file"><a href="">File 1</a></li>
+				<li class="file"><a href="">File_1</a></li>
 				<li class="tree">
-					<label for="subfolder2"><a href="minds?root=subfolder2">Subfolder 1</a></label> <input type="checkbox" id="subfolder1" />
+					<label for="subfolder"><a href="minds?root=subfolder">Subfolder_1</a></label> <input type="checkbox" id="subfolder1" />
 					<ol>
-						<li class="file"><a href="">Subfile 1</a></li>
-						<li class="file"><a href="">Subfile 2</a></li>
-						<li class="file"><a href="">Subfile 3</a></li>
+						<li class="file"><a href="">Subfile_1</a></li>
+						<li class="file"><a href="">Subfile_2</a></li>
+						<li class="file"><a href="">Subfile_3</a></li>
 					</ol>
 				</li>
 			</ol>

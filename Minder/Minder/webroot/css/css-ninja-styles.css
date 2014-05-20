@@ -2,7 +2,7 @@
 ol.tree
 {
 	padding: 0 0 0 30px;
-	width: 300px;
+	width: 80%;
 }
 	li.tree 
 	{ 
@@ -12,7 +12,9 @@ ol.tree
 	}
 	li.file
 	{
+		position: relative;
 		margin-left: -1px !important;
+		border-bottom: 1px solid #333;
 	}
 		li.file a
 		{
@@ -26,6 +28,26 @@ ol.tree
 		li.file a[href *= '.html']	{ background: url(../images/document.png) 0 0 no-repeat; }
 		li.file a[href $= '.css']	{ background: url(../images/document.png) 0 0 no-repeat; }
 		li.file a[href $= '.js']		{ background: url(../images/document.png) 0 0 no-repeat; }
+		li.file span {
+					display:inline-block;    
+					width:33%;
+					text-align:right;
+					color: #777;
+		}
+		
+		li.file span.filename {
+					display:inline-block;    
+					width:33%;
+					text-align:left;
+					color: #CCC;
+		}
+		li.file span.empty {
+					display:inline-block;    
+					width:33%;
+					text-align:left;
+					color: #777;
+		}
+
 	li input
 	{
 		position: absolute;

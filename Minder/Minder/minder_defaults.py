@@ -59,11 +59,7 @@ main_template = """<!DOCTYPE html>
             ${navbar_active}
           </ul>
         </div><!--/.nav-collapse -->
-      <ol class="breadcrumb">
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Library</a></li>
-          <li class="active">Data</li>
-      </ol>
+        ${breadcrumbs}
       </div>
       <div class="container theme-showcase" role="main">
         ${main_container}
@@ -146,24 +142,58 @@ remotes = """
 """
 
 minds = """
-<legend>${section}</legend>
+<legend>Minds</legend>
 <p>This is the minds page.</p>
-	<ol class="tree">
-		<li class="tree">
-			<label for="folder2">Folder_1</label> <input type="checkbox" id="folder" />
-			<ol>
-				<li class="file"><a href="">File_1</a></li>
-				<li class="tree">
-					<label for="subfolder"><a href="minds?root=subfolder">Subfolder_1</a></label> <input type="checkbox" id="subfolder1" />
-					<ol>
-						<li class="file"><a href="">Subfile_1</a></li>
-						<li class="file"><a href="">Subfile_2</a></li>
-						<li class="file"><a href="">Subfile_3</a></li>
-					</ol>
-				</li>
-			</ol>
-		</li>
-	</ol>
+    <ol class="tree">
+
+        <li class="tree">
+            <label for="x"><a href="minds?root=x">x</a></label><input type="checkbox" id="x"/>
+            <ol>
+
+        <li class="tree">
+            <label for="y1"><a href="minds?root=y1">y1</a></label><input type="checkbox" id="y1"/>
+            <ol>
+
+        <li class="tree">
+            <label for="y1_2"><a href="minds?root=y1_2">y1_2</a></label><input type="checkbox" id="y1_2"/>
+            <ol>
+
+            <li class="file"><span class="empty">(empty)</span></li>
+            </ol>
+        </li>
+
+            <li class="file"><span class="filename">y0.txt</span><span class="file">100 bytes</span><span class="file">text/plain</span></li>
+            <li class="file"><span class="filename">y1.txt</span><span class="file">99 bytes</span><span class="file">text/plain</span></li>
+            <li class="file"><span class="filename">y2.txt</span><span class="file">98 bytes</span><span class="file">text/plain</span></li>
+
+            </ol>
+        </li>
+
+        <li class="tree">
+            <label for="y2"><a href="minds?root=y2">y2</a></label><input type="checkbox" id="y2"/>
+            <ol>
+
+        <li class="tree">
+            <label for="y2_1"><a href="minds?root=y2_1">y2_1</a></label><input type="checkbox" id="y2_1"/>
+            <ol>
+
+            <li class="file"><span class="filename">y3.txt</span><span class="file">97 bytes</span><span class="file">text/plain</span></li>
+            <li class="file"><span class="filename">y4.txt</span><span class="file">96 bytes</span><span class="file">text/plain</span></li>
+
+            </ol>
+        </li>
+
+            <li class="file"><span class="filename">y5.txt</span><span class="file">95 bytes</span><span class="file">text/plain</span></li>
+            <li class="file"><span class="filename">y6.txt</span><span class="file">94 bytes</span><span class="file">text/plain</span></li>
+
+            </ol>
+        </li>
+
+            <li class="file"><span class="empty">(empty)</span></li>
+            </ol>
+        </li>
+
+    </ol>
 """
 
 config = """{
@@ -280,3 +310,17 @@ mind = """{
         }
     }
 }"""
+
+breadcrumbs = """
+      <ol class="breadcrumb">
+          ${breadcrumb}
+      </ol>
+"""
+
+breadcrumb_refs = """
+          <li><a href="${path_to}">${path_part}</a></li>
+"""
+
+breadcrumb_active = """
+          <li class="active">${path_part}</li>
+"""

@@ -20,13 +20,14 @@ methods_list = {'index': 'md.index',
 
 
 def get_template(path_name=None):
-    """Parameters: [title (String), navbar_active[key],
+    """Parameters: [title (String), navbar_active[key], breadcrumbs
     main_container(content)]"""
     sd = {}
     p = path_name.split('.')[0]
     print p
     sd['title'] = p
     sd['navbar_active'] = md.navbar_active[p]
+    sd['breadcrumbs'] = md.breadcrumbs
     sd['main_container'] = eval(methods_list[p])
     t = Template(md.main_template)
     html_string = t.substitute(sd)

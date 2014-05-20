@@ -16,7 +16,7 @@ WEBROOT = os.path.join(CUR_DIR, 'webroot')
 mt = Template(md.minds)
 methods_list = {'index': 'md.index',
      'settings': 'expand_settings()',
-     'minds': 'mt.substitute(iterFolders(md.mind, final_html=[]))',
+     'minds': 'mt.substitute(iter_folders(md.mind))',
      'remotes': 'md.remotes'}
 
 
@@ -49,7 +49,7 @@ def expand_settings():
     return final_html
 
 
-def iterFolders(d, final_html=None):
+def iter_folders(d, final_html=None):
 
     if final_html is None:
         final_html = []
@@ -70,7 +70,7 @@ def iterFolders(d, final_html=None):
 
     if len(d['folders']) > 0:
         for folder in d['folders']:
-            iterFolders(folder, final_html)
+            iter_folders(folder, final_html)
         final_html.append(eft.substitute(fd))
 
     else:

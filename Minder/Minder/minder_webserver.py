@@ -13,9 +13,10 @@ HOST_NAME = ''
 PORT_NUMBER = 8051
 CUR_DIR = os.getcwd()
 WEBROOT = os.path.join(CUR_DIR, 'webroot')
+mt = Template(md.minds)
 methods_list = {'index': 'md.index',
      'settings': 'expand_settings()',
-     'minds': 'md.minds',
+     'minds': 'mt.substitute(iterFolders(md.mind, final_html=[]))',
      'remotes': 'md.remotes'}
 
 
@@ -27,7 +28,7 @@ def get_template(path_name=None):
     print p
     sd['title'] = p
     sd['navbar_active'] = md.navbar_active[p]
-    sd['breadcrumbs'] = md.breadcrumbs
+    sd['breadcrumbs'] = md.breadcrumb_list
     sd['main_container'] = eval(methods_list[p])
     t = Template(md.main_template)
     html_string = t.substitute(sd)
@@ -46,6 +47,34 @@ def expand_settings():
             form_builder['form_groups'] += ft.substitute(i)
         final_html += st.substitute(form_builder)
     return final_html
+
+
+def iterFolders(d, final_html=[]):
+
+    bft = Template(md.begin_folders_template)
+    fit = Template(md.files_template)
+    eft = Template(md.end_folders_template)
+
+    final_html.append(bft.substitute(d))
+    fd = {"file_html": ""}
+
+    if len(d['files']) > 0:
+        for fi in d['files']:
+            fd['file_html'] += fit.substitute(fi)
+
+    if len(d['files']) == 0:
+        fd['file_html'] += md.empty_files_template
+
+    if len(d['folders']) > 0:
+        for folder in d['folders']:
+            iterFolders(folder, final_html)
+        final_html.append(eft.substitute(fd))
+
+    else:
+        final_html.append(eft.substitute(fd))
+
+    result = ''.join(final_html)
+    return {"folders_template": result}
 
 
 def get_file(file_name):

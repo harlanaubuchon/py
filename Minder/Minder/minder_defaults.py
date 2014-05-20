@@ -141,60 +141,27 @@ remotes = """
 <p>This is the remotes page.</p>
 """
 
-minds = """
-<legend>Minds</legend>
-<p>This is the minds page.</p>
+minds = """<legend>Minds</legend>
+<p>Choose a folder to Mind.</p>
     <ol class="tree">
+        ${folders_template}
+    </ol>"""
 
+begin_folders_template = """
         <li class="tree">
-            <label for="x"><a href="minds?root=x">x</a></label><input type="checkbox" id="x"/>
+            <label for="${name}"><a href="minds?root=${name}">${name}</a></label><input type="checkbox" id="${name}"/>
             <ol>
-
-        <li class="tree">
-            <label for="y1"><a href="minds?root=y1">y1</a></label><input type="checkbox" id="y1"/>
-            <ol>
-
-        <li class="tree">
-            <label for="y1_2"><a href="minds?root=y1_2">y1_2</a></label><input type="checkbox" id="y1_2"/>
-            <ol>
-
-            <li class="file"><span class="empty">(empty)</span></li>
-            </ol>
-        </li>
-
-            <li class="file"><span class="filename">y0.txt</span><span class="file">100 bytes</span><span class="file">text/plain</span></li>
-            <li class="file"><span class="filename">y1.txt</span><span class="file">99 bytes</span><span class="file">text/plain</span></li>
-            <li class="file"><span class="filename">y2.txt</span><span class="file">98 bytes</span><span class="file">text/plain</span></li>
-
-            </ol>
-        </li>
-
-        <li class="tree">
-            <label for="y2"><a href="minds?root=y2">y2</a></label><input type="checkbox" id="y2"/>
-            <ol>
-
-        <li class="tree">
-            <label for="y2_1"><a href="minds?root=y2_1">y2_1</a></label><input type="checkbox" id="y2_1"/>
-            <ol>
-
-            <li class="file"><span class="filename">y3.txt</span><span class="file">97 bytes</span><span class="file">text/plain</span></li>
-            <li class="file"><span class="filename">y4.txt</span><span class="file">96 bytes</span><span class="file">text/plain</span></li>
-
-            </ol>
-        </li>
-
-            <li class="file"><span class="filename">y5.txt</span><span class="file">95 bytes</span><span class="file">text/plain</span></li>
-            <li class="file"><span class="filename">y6.txt</span><span class="file">94 bytes</span><span class="file">text/plain</span></li>
-
-            </ol>
-        </li>
-
-            <li class="file"><span class="empty">(empty)</span></li>
-            </ol>
-        </li>
-
-    </ol>
 """
+
+files_template = """<li class="file"><span class="filename">${name}</span><span class="file">${size} bytes</span><span class="file">${mime_type}</span></li>\n            """
+
+end_folders_template = """
+            ${file_html}
+            </ol>
+        </li>
+"""
+
+empty_files_template = """<li class="file"><span class="empty">(empty)</span></li>"""
 
 config = """{
     "config": [
@@ -250,77 +217,106 @@ config = """{
     ]
 }"""
 
-mind = """{
-    "/home/harlanaubuchon/x": {
-        "minded_datetime": "2014-05-01T22:21:08.570Z",
-        "x": {
-            ".mind": {},
-            "x1.txt": {
-                "file_size": 0,
-                "md5_sum": "d41d8cd98f00b204e9800998ecf8427e",
-                "mime_type": [
-                    "text",
-                    "plain"
+mind = {
+    "root": "/home/harlanaubuchon/",
+    "name": "x",
+    "files": [],
+    "folders": [
+                {
+                 "root": "/home/harlanaubuchon/x/",
+                 "name": "y1",
+                 "folders": [
+                             {
+                             "root": "/home/harlanaubuchon/x/y1/",
+                             "name": "y1_2",
+                             "folders": [],
+                             "files": []
+                             }
+                             ],
+                 "files": [
+                           {
+                           "name": "y0.txt",
+                           "mime_type": "text/plain",
+                           "size": 100,
+                           "checksum": "c873loihagkjhsdo8y98wqyeshdlkahs"
+                           },
+                           {
+                           "name": "y1.txt",
+                           "mime_type": "text/plain",
+                           "size": 99,
+                           "checksum": "b873loihagkjhsdo8y98wqyeshdlkahs"
+                           },
+                           {
+                           "name": "y2.txt",
+                           "mime_type": "text/plain",
+                           "size": 98,
+                           "checksum": "a873loihagkjhsdo8y98wqyeshdlkahs"
+                           }
+                           ]
+                 },
+                {
+                 "root": "/home/harlanaubuchon/x/",
+                 "name": "y2",
+                 "folders": [
+                            {
+                             "root": "/home/harlanaubuchon/x/y2/",
+                             "name": "y2_1",
+                             "folders": [],
+                             "files": [
+                                       {
+                                       "name": "y3.txt",
+                                       "mime_type": "text/plain",
+                                       "size": 97,
+                                       "checksum": "d873loihagkjhsdo8y98wqyeshdlkahs"
+                                       },
+                                       {
+                                       "name": "y4.txt",
+                                       "mime_type": "text/plain",
+                                       "size": 96,
+                                       "checksum": "e873loihagkjhsdo8y98wqyeshdlkahs"
+                                       }
+                                       ]
+                             }
+                            ],
+                 "files": [
+                           {
+                           "name": "y5.txt",
+                           "mime_type": "text/plain",
+                           "size": 95,
+                           "checksum": "f873loihagkjhsdo8y98wqyeshdlkahs"
+                           },
+                           {
+                           "name": "y6.txt",
+                           "mime_type": "text/plain",
+                           "size": 94,
+                           "checksum": "g873loihagkjhsdo8y98wqyeshdlkahs"
+                           }
+                           ]
+                 }
                 ]
-            },
-            "x2.txt": {
-                "file_size": 0,
-                "md5_sum": "d41d8cd98f00b204e9800998ecf8427e",
-                "mime_type": [
-                    "text",
-                    "plain"
-                ]
-            },
-            "y1": {
-                "y1.txt": {
-                    "file_size": 0,
-                    "md5_sum": "d41d8cd98f00b204e9800998ecf8427e",
-                    "mime_type": [
-                        "text",
-                        "plain"
-                    ]
-                },
-                "y2.txt": {
-                    "file_size": 0,
-                    "md5_sum": "d41d8cd98f00b204e9800998ecf8427e",
-                    "mime_type": [
-                        "text",
-                        "plain"
-                    ]
-                }
-            },
-            "y2": {
-                "y3.txt": {
-                    "file_size": 0,
-                    "md5_sum": "d41d8cd98f00b204e9800998ecf8427e",
-                    "mime_type": [
-                        "text",
-                        "plain"
-                    ]
-                },
-                "y4.txt": {
-                    "file_size": 0,
-                    "md5_sum": "d41d8cd98f00b204e9800998ecf8427e",
-                    "mime_type": [
-                        "text",
-                        "plain"
-                    ]
-                }
-            }
-        }
     }
-}"""
 
 breadcrumbs = """
       <ol class="breadcrumb">
-          ${breadcrumb}
+          ${breadcrumb_list}
       </ol>
 """
 
 breadcrumb_refs = """
-          <li><a href="${path_to}">${path_part}</a></li>
+          <li><a href="/minds?root=/${path}">${name}</a></li>
 """
 
 breadcrumb_active = """
-          <li class="active">${path_part}</li>
+          <li class="active">${name}</li>
 """
+
+breadcrumb_list = """
+      <ol class="breadcrumb">
+
+          <li><a href="/minds?root=/home">home</a></li>
+
+          <li><a href="/minds?root=/home/harlanaubuchon">harlanaubuchon</a></li>
+
+          <li class="active">x</li>
+
+      </ol>"""

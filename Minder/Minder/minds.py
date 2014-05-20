@@ -116,5 +116,5 @@ def _read_mind_palace(mind_path):
     return json_dir
 
 if __name__ == "__main__":
-    m = mind('/home/nykhedimus/x')
+    m = mind('/home/harlanaubuchon/x')
     print m

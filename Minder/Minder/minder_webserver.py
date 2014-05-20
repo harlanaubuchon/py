@@ -49,7 +49,10 @@ def expand_settings():
     return final_html
 
 
-def iterFolders(d, final_html=[]):
+def iterFolders(d, final_html=None):
+
+    if final_html is None:
+        final_html = []
 
     bft = Template(md.begin_folders_template)
     fit = Template(md.files_template)

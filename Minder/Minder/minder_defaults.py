@@ -149,7 +149,7 @@ minds = """<legend>Minds</legend>
 
 begin_folders_template = """
         <li class="tree">
-            <label for="${name}"><a href="minds?root=${name}">${name}</a></label><input type="checkbox" id="${name}"/>
+            <label for="${name}"><a href="minds?root=${root}/${name}">${name}</a></label><input type="checkbox" id="${name}"/>
             <ol>
 """
 
@@ -217,7 +217,7 @@ config = """{
     ]
 }"""
 
-mind = {
+mind_old = {
     "root": "/home/harlanaubuchon/",
     "name": "x",
     "files": [],
@@ -320,3 +320,103 @@ breadcrumb_list = """
           <li class="active">x</li>
 
       </ol>"""
+
+mind = {
+    "files": [],
+    "folders": [
+        {
+            "files": [
+                {
+                    "checksum": "17748a55c79f5fd63906a3b72fdb33db",
+                    "mime_type": [
+                        "text",
+                        "plain"
+                    ],
+                    "name": "y0.txt",
+                    "size": 24
+                },
+                {
+                    "checksum": "6fe05d420e64dfde21fb80e021012725",
+                    "mime_type": [
+                        "text",
+                        "plain"
+                    ],
+                    "name": "y1.txt",
+                    "size": 48
+                },
+                {
+                    "checksum": "f2c84ca801223da9af918e673231a170",
+                    "mime_type": [
+                        "text",
+                        "plain"
+                    ],
+                    "name": "y2.txt",
+                    "size": 72
+                }
+            ],
+            "folders": [
+                {
+                    "files": [],
+                    "folders": [],
+                    "name": "y1_2",
+                    "root": "/home/harlanaubuchon/z/x/y1"
+                }
+            ],
+            "name": "y1",
+            "root": "/home/harlanaubuchon/z/x"
+        },
+        {
+            "files": [
+                {
+                    "checksum": "ec0cbaa49d8ea0411ecf406385789c08",
+                    "mime_type": [
+                        "text",
+                        "plain"
+                    ],
+                    "name": "y6.txt",
+                    "size": 162
+                },
+                {
+                    "checksum": "d9857ed821a1ae0006dcb0e06f406759",
+                    "mime_type": [
+                        "text",
+                        "plain"
+                    ],
+                    "name": "y5.txt",
+                    "size": 139
+                }
+            ],
+            "folders": [
+                {
+                    "files": [
+                        {
+                            "checksum": "da6131d255860149f51a5730b7f69d0a",
+                            "mime_type": [
+                                "text",
+                                "plain"
+                            ],
+                            "name": "y3.txt",
+                            "size": 93
+                        },
+                        {
+                            "checksum": "ad4f5dd9e86d927d55a3dc037fbf91cf",
+                            "mime_type": [
+                                "text",
+                                "plain"
+                            ],
+                            "name": "y4.txt",
+                            "size": 116
+                        }
+                    ],
+                    "folders": [],
+                    "name": "y2_1",
+                    "root": "/home/harlanaubuchon/z/x/y2"
+                }
+            ],
+            "name": "y2",
+            "root": "/home/harlanaubuchon/z/x"
+        }
+    ],
+    "name": "x",
+    "root": "/home/harlanaubuchon/z"
+}

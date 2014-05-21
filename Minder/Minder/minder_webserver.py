@@ -6,6 +6,7 @@ import json
 from string import Template
 import minder_config as mc
 import minder_defaults as md
+import minds
 import mimetypes
 
 
@@ -13,25 +14,38 @@ HOST_NAME = ''
 PORT_NUMBER = 8051
 CUR_DIR = os.getcwd()
 WEBROOT = os.path.join(CUR_DIR, 'webroot')
-mt = Template(md.minds)
+mit = Template(md.minds)
 methods_list = {'index': 'md.index',
      'settings': 'expand_settings()',
-     'minds': 'mt.substitute(iterFolders(md.mind, final_html=[]))',
+     'minds': 'mit.substitute(iter_folders(md.mind, final_html=[]))',
      'remotes': 'md.remotes'}
 
+#TODO Maybe put some of these methods in the WebServer so we can access self.path?
 
-def get_template(path_name=None):
+def get_template(path_name=None, params=None):
     """Parameters: [title (String), navbar_active[key], breadcrumbs
     main_container(content)]"""
     sd = {}
     p = path_name.split('.')[0]
-    print p
+    print p, params
     sd['title'] = p
     sd['navbar_active'] = md.navbar_active[p]
-    sd['breadcrumbs'] = md.breadcrumb_list
-    sd['main_container'] = eval(methods_list[p])
-    t = Template(md.main_template)
-    html_string = t.substitute(sd)
+    if params is not None and p == 'minds':
+        pm = params.split('=')[1]
+        minds_dict = minds.interrogate(pm)
+        sd['main_container'] = mit.substitute(iter_folders(minds_dict))
+        sd['breadcrumbs'] = breadcrumber(minds_dict)
+
+    elif params is None and p == 'minds':
+        sd['main_container'] = mit.substitute(iter_folders(minds.interrogate('/home/harlanaubuchon/z')))
+        sd['breadcrumbs'] = md.breadcrumb_list
+
+    else:
+        sd['main_container'] = eval(methods_list[p])
+        sd['breadcrumbs'] = md.breadcrumb_list
+
+    mt = Template(md.main_template)
+    html_string = mt.substitute(sd)
     return html_string
 
 
@@ -41,7 +55,11 @@ def expand_settings():
     st = Template(md.settings)
     final_html = ""
     for section in config_dict['config']:
-        form_builder = {"section": None, "form_groups":""}
+        form_builder = {
+                        "section": None,
+                        "form_groups": ""
+        }
+
         form_builder['section'] = section['section']['name']
         for i in section['section']['items']:
             form_builder['form_groups'] += ft.substitute(i)
@@ -49,12 +67,12 @@ def expand_settings():
     return final_html
 
 
-def iterFolders(d, final_html=[]):
-
+def iter_folders(d, final_html=None):
+    if final_html is None:
+        final_html = []
     bft = Template(md.begin_folders_template)
     fit = Template(md.files_template)
     eft = Template(md.end_folders_template)
-
     final_html.append(bft.substitute(d))
     fd = {"file_html": ""}
 
@@ -67,7 +85,7 @@ def iterFolders(d, final_html=[]):
 
     if len(d['folders']) > 0:
         for folder in d['folders']:
-            iterFolders(folder, final_html)
+            iter_folders(folder, final_html)
         final_html.append(eft.substitute(fd))
 
     else:
@@ -77,7 +95,41 @@ def iterFolders(d, final_html=[]):
     return {"folders_template": result}
 
 
+def breadcrumber(t):
+    bct = Template(md.breadcrumbs)
+    brt = Template(md.breadcrumb_refs)
+    bat = Template(md.breadcrumb_active)
+    root_path = os.path.join(t['root'], t['name'])
+    breadcrumb = []
+    html_list = []
+
+    for parts in root_path.split(os.path.sep):
+        breadcrumb.append(parts)
+
+    if breadcrumb[0] == '':
+        breadcrumb.pop(0)
+
+    for b in range(len(breadcrumb)):
+        pd = {
+            'path': os.path.sep.join(breadcrumb),
+            'name': breadcrumb.pop(-1)
+        }
+        html_list.append(pd)
+    html_list.reverse()
+
+    breadcrumb_html = ""
+    active_html = bat.substitute(html_list.pop(-1))
+    for h in html_list:
+        breadcrumb_html += brt.substitute(h)
+
+    breadcrumb_html += active_html
+    final_html = {"breadcrumb_list": breadcrumb_html}
+
+    return bct.substitute(final_html)
+
+
 def get_file(file_name):
+    #TODO CR: fix to use 'with open()'
     f = open(WEBROOT + file_name)
     file_string = f.read()
     m = mimetypes.guess_type(WEBROOT + file_name)
@@ -94,16 +146,28 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
     def do_GET(self):
+        #TODO CR: Use a proper logger
+        #print self.path
         try:
             if self.path.endswith('.html'):
-                h = get_template(self.path.strip(os.path.sep))
+                h = get_template(self.path.strip('/'))
                 self.send_response(200)
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.wfile.write(h)
+
+            elif len(self.path.split('?')) > 1:
+                g = self.path.split('?')
+                print g
+                h = get_template(g[0].strip('/'), g[1])
+                self.send_response(200)
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.wfile.write(h)
+
             else:
                 c = get_file(self.path)
-                print self.path
+                #print "Retreiving file - %s" % self.path
                 self.send_response(200)
                 self.send_header("Content-type", c[0])
                 self.end_headers()

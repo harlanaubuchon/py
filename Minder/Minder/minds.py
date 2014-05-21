@@ -26,7 +26,9 @@ def _init_mindtypes():
         mind_types[k][i] = mimetypes.types_map[i]
     return mind_types
 
+
 mindtypes = _init_mindtypes()
+
 
 def mind(mind_path, refresh=False):
     """ 
@@ -55,45 +57,58 @@ def mind(mind_path, refresh=False):
     return mind_palace
 
 
-def interrogate(mind_path, mind_dir):
+def _file_obj(path):
+    size_limit = int(M_CONFIG['defaults']['file_size_limit_in_kilobytes'])
+    file_name = os.path.split(path)[-1]
+    file_size = int(os.path.getsize(path))
+
+    if file_size < size_limit:
+        with open(path) as file_handle:
+            file_data = file_handle.read()
+            #TODO Add flag to determine if this is from the webapp
+            checksum = hashlib.md5(file_data).hexdigest()
+    else:
+        checksum = None
+
+    guess_mime = mimetypes.guess_type(file_name)
+    if guess_mime[0] is not None:
+        mime_type = guess_mime[0].split('/')
+    else:
+        mime_type = ['None', 'Unknown']
+
+    mind_file = {
+        "name": os.path.split(path)[-1],
+        "mime_type": '/'.join(mime_type),
+        "size": file_size,
+        "checksum": checksum
+    }
+
+    return mind_file
+
+
+def interrogate(mind_path, mind_dir=None):
     """
-    Adapted from:
-    code.activestate.com/recipes/577879-create-a-nested-dictionary-from-oswalk
-    Created by Andrew Clark on Mon, 26 Sep 2011 (MIT)
     Creates a nested dictionary that represents the folder structure of mind_path
     """
-    file_dir = {}
-    mind_path = mind_path.rstrip(os.sep)
-    start = mind_path.rfind(os.sep) + 1
-    size_limit = int(M_CONFIG['defaults']['file_size_limit_in_kilobytes'])
-    
-    for path, dirs, files in os.walk(mind_path):
-        folders = path[start:].split(os.sep)
-        subdir = dict.fromkeys(files)
-        if len(files) > 0:
-            for file_name in files:
-                file_path = os.path.join(path, file_name)
-                file_size = int(os.path.getsize(file_path) / 1024)
-                if file_size < size_limit:
-                    with open(file_path) as file_handle:
-                        file_data = file_handle.read()
-                        checksum = hashlib.md5(file_data).hexdigest()
-                else:
-                    checksum = None
-                guess_mime = mimetypes.guess_type(file_name)
+    list_dir = os.listdir(mind_path)
+    file_list = []
+    folder_list = []
 
-                if guess_mime[0] is not None:
-                    mime_type = guess_mime[0].split('/')
-                else:
-                    mime_type = None
-                    
-                subdir[file_name] = {"md5_sum": checksum, "mime_type": mime_type, "file_size": file_size}
+    for name in list_dir:
+        file_path = os.path.join(mind_path, name)
+        if os.path.isfile(file_path) is True:
+            file_list.append(_file_obj(file_path))
 
-        parent = reduce(dict.get, folders[:-1], file_dir)
-        parent[folders[-1]] = subdir
+        if os.path.isdir(file_path) is True:
+            q = interrogate(file_path)
+            folder_list.append(q)
 
-    dir_key = file_dir.keys()[0]
-    mind_dir[mind_path][dir_key] = file_dir[dir_key]
+    mind_dir = {
+        "root": os.path.split(mind_path)[0],
+        "name": os.path.split(mind_path)[-1],
+        "files": file_list,
+        "folders": folder_list
+    }
 
     return mind_dir
 
@@ -115,6 +130,7 @@ def _read_mind_palace(mind_path):
 
     return json_dir
 
+
 if __name__ == "__main__":
-    m = mind('/home/harlanaubuchon/x')
+    m = mind('/home/harlanaubuchon/x', refresh=True)
     print m

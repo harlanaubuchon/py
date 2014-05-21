@@ -17,7 +17,7 @@ WEBROOT = os.path.join(CUR_DIR, 'webroot')
 mit = Template(md.minds)
 methods_list = {'index': 'md.index',
      'settings': 'expand_settings()',
-     'minds': 'mit.substitute(iter_folders(md.mind, final_html=[]))',
+     'minds': 'mit.substitute(iter_folders(md.mind))',
      'remotes': 'md.remotes'}
 
 #TODO Maybe put some of these methods in the WebServer so we can access self.path?
@@ -167,7 +167,7 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
 
             else:
                 c = get_file(self.path)
-                #print "Retreiving file - %s" % self.path
+                print "Retreiving file - %s" % self.path
                 self.send_response(200)
                 self.send_header("Content-type", c[0])
                 self.end_headers()

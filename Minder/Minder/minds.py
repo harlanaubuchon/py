@@ -57,22 +57,23 @@ def mind(mind_path, refresh=False):
     return mind_palace
 
 
-def _file_obj(path):
+def _file_obj(path, hidden_files=False):
     size_limit = int(M_CONFIG['defaults']['file_size_limit_in_kilobytes'])
     file_name = os.path.split(path)[-1]
     file_size = int(os.path.getsize(path))
 
-    if file_size < size_limit:
-        with open(path) as file_handle:
-            file_data = file_handle.read()
-            #TODO Add flag to determine if this is from the webapp
-            checksum = hashlib.md5(file_data).hexdigest()
-    else:
-        checksum = None
+    checksum = None
+
+    if hidden_files is True:
+        if file_size < size_limit:
+            with open(path) as file_handle:
+                file_data = file_handle.read()
+                checksum = hashlib.md5(file_data).hexdigest()
 
     guess_mime = mimetypes.guess_type(file_name)
     if guess_mime[0] is not None:
         mime_type = guess_mime[0].split('/')
+
     else:
         mime_type = ['None', 'Unknown']
 
@@ -86,30 +87,53 @@ def _file_obj(path):
     return mind_file
 
 
-def interrogate(mind_path, mind_dir=None):
+def interrogate(mind_path, mind_dir=None, hidden_files=False):
     """
     Creates a nested dictionary that represents the folder structure of mind_path
     """
-    list_dir = os.listdir(mind_path)
-    file_list = []
+    print hidden_files
     folder_list = []
+    file_list = []
 
-    for name in list_dir:
-        file_path = os.path.join(mind_path, name)
-        if os.path.isfile(file_path) is True:
-            file_list.append(_file_obj(file_path))
+    for node in os.listdir(mind_path):
+        node_path = os.path.join(mind_path, node)
 
-        if os.path.isdir(file_path) is True:
-            q = interrogate(file_path)
-            folder_list.append(q)
+        if os.path.isfile(node_path) is True:
+            if hidden_files is False and node.startswith('.') is False:
+                file_list.append(node)
+
+            if hidden_files is True:
+                file_list.append(node)
+
+        if os.path.isdir(node_path) is True:
+            if hidden_files is False and node.startswith('.') is False:
+                folder_list.append(node)
+
+            if hidden_files is True:
+                folder_list.append(node)
+
+    folder_list.sort()
+    file_list.sort()
+
+    file_dict_list = []
+    folder_dict_list = []
+
+    for file_name in file_list:
+        file_path = os.path.join(mind_path, file_name)
+        file_dict_list.append(_file_obj(file_path, hidden_files))
+
+    for folder_name in folder_list:
+        file_path = os.path.join(mind_path, folder_name)
+        folder_dict_list.append(interrogate(file_path, hidden_files))
 
     mind_dir = {
         "root": os.path.split(mind_path)[0],
         "name": os.path.split(mind_path)[-1],
-        "files": file_list,
-        "folders": folder_list
+        "files": file_dict_list,
+        "folders": folder_dict_list
     }
-
+    #ji = json.dumps(mind_dir, indent=4, sort_keys=True)
+    #result = json.loads(ji)
     return mind_dir
 
 

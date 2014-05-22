@@ -6,6 +6,7 @@ DEFAULT_CONFIG = {
                          "space_remaining_threshold_bytes": 2048,
                          "text_difference_threshold_percentage": 99,
                          "file_size_limit_in_kilobytes": 300000,
+                         "show_hidden_files": False,
                          },
                      "minds": {}
                      }
@@ -52,7 +53,7 @@ main_template = """<!DOCTYPE html>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/index.html">Minder</a>
+          <a class="navbar-brand" href="/home.html">Minder</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -74,25 +75,25 @@ main_template = """<!DOCTYPE html>
 """
 # Provide key
 navbar_active = {"minds": """
-            <li><a href="index.html">Home</a></li>
+            <li><a href="home.html">Home</a></li>
             <li class="active"><a href="minds.html">.Minds</a></li>
             <li><a href="remotes.html">Remotes</a></li>
             <li><a href="settings.html">Settings</a></li>
             """,
                  "settings": """
-            <li><a href="index.html">Home</a></li>
+            <li><a href="home.html">Home</a></li>
             <li><a href="minds.html">.Minds</a></li>
             <li><a href="remotes.html">Remotes</a></li>
             <li class="active"><a href="settings.html">Settings</a></li>
             """,
                  "remotes": """
-            <li><a href="index.html">Home</a></li>
+            <li><a href="home.html">Home</a></li>
             <li><a href="minds.html">.Minds</a></li>
             <li class="active"><a href="remotes.html">Remotes</a></li>
             <li><a href="settings.html">Settings</a></li>
             """,
-                 "index": """
-            <li class="active"><a href="index.html">Home</a></li>
+                 "home": """
+            <li class="active"><a href="home.html">Home</a></li>
             <li><a href="minds.html">.Minds</a></li>
             <li><a href="remotes.html">Remotes</a></li>
             <li><a href="settings.html">Settings</a></li>
@@ -123,7 +124,7 @@ form_group = """
 """
 
 # Parameters: None
-index = """
+home = """
 <div class="container">
   <div class="jumbotron">
     <h1>.Minder</h1>
@@ -189,6 +190,13 @@ config = """{
                 "type": "number",
                 "label": "File Diff Size Limit",
                 "uom": "kilobytes"
+                },
+                {
+                "key": "show_hidden_files",
+                "value": "True",
+                "type": "text",
+                "label": "Show Hidden Files",
+                "uom": null
                 }
             ]
           }

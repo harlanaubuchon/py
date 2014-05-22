@@ -15,9 +15,10 @@ PORT_NUMBER = 8051
 CUR_DIR = os.getcwd()
 WEBROOT = os.path.join(CUR_DIR, 'webroot')
 mit = Template(md.minds)
-methods_list = {'index': 'md.index',
+methods_list = {'home': 'md.home',
+                'index': 'md.index',
      'settings': 'expand_settings()',
-     'minds': 'mit.substitute(iter_folders(md.mind))',
+     'minds': 'mit.substitute(iter_folders(md.mind, hidden_files=False))',
      'remotes': 'md.remotes'}
 
 #TODO Maybe put some of these methods in the WebServer so we can access self.path?
@@ -25,6 +26,7 @@ methods_list = {'index': 'md.index',
 def get_template(path_name=None, params=None):
     """Parameters: [title (String), navbar_active[key], breadcrumbs
     main_container(content)]"""
+    hidden_files = False
     sd = {}
     p = path_name.split('.')[0]
     print p, params
@@ -32,17 +34,18 @@ def get_template(path_name=None, params=None):
     sd['navbar_active'] = md.navbar_active[p]
     if params is not None and p == 'minds':
         pm = params.split('=')[1]
-        minds_dict = minds.interrogate(pm)
+        minds_dict = minds.interrogate(pm, hidden_files)
         sd['main_container'] = mit.substitute(iter_folders(minds_dict))
         sd['breadcrumbs'] = breadcrumber(minds_dict)
 
     elif params is None and p == 'minds':
-        sd['main_container'] = mit.substitute(iter_folders(minds.interrogate('/home/harlanaubuchon/z')))
-        sd['breadcrumbs'] = md.breadcrumb_list
+        minds_dict = minds.interrogate(mc.USER_DIRECTORY, hidden_files)
+        sd['main_container'] = mit.substitute(iter_folders(minds_dict))
+        sd['breadcrumbs'] = breadcrumber(minds_dict)
 
     else:
         sd['main_container'] = eval(methods_list[p])
-        sd['breadcrumbs'] = md.breadcrumb_list
+        sd['breadcrumbs'] = breadcrumber({'root': '', 'name': p})
 
     mt = Template(md.main_template)
     html_string = mt.substitute(sd)
@@ -197,7 +200,7 @@ if __name__ == '__main__':
     server_class = BaseHTTPServer.HTTPServer
     httpd = server_class((HOST_NAME, PORT_NUMBER), MinderWebApp)
     print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
-    webbrowser.open("http://localhost:8051/index.html", new=0)
+    webbrowser.open("http://localhost:8051/home.html", new=0)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

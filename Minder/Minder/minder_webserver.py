@@ -15,11 +15,13 @@ PORT_NUMBER = 8051
 CUR_DIR = os.getcwd()
 WEBROOT = os.path.join(CUR_DIR, 'webroot')
 mit = Template(md.minds)
-methods_list = {'home': 'md.home',
-                'index': 'md.index',
-     'settings': 'expand_settings()',
-     'minds': 'mit.substitute(iter_folders(md.mind, hidden_files=False))',
-     'remotes': 'md.remotes'}
+methods_list = {
+    'home': 'md.home',
+    'index': 'md.index',
+    'settings': 'expand_settings()',
+    'minds': 'mit.substitute(iter_folders(md.mind, hidden_files=False))',
+    'remotes': 'md.remotes'
+}
 
 #TODO Maybe put some of these methods in the WebServer so we can access self.path?
 

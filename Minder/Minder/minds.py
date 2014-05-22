@@ -156,5 +156,5 @@ def _read_mind_palace(mind_path):
 
 
 if __name__ == "__main__":
-    m = mind('/home/harlanaubuchon/x', refresh=True)
+    m = mind(USER_DIR, refresh=True)
     print m

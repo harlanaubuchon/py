@@ -8,6 +8,7 @@ import minder_config as mc
 import minder_defaults as md
 import minds
 import mimetypes
+import urllib
 
 
 HOST_NAME = ''
@@ -22,16 +23,18 @@ methods_list = {
     'minds': 'mit.substitute(iter_folders(md.mind, hidden_files=False))',
     'remotes': 'md.remotes'
 }
-
+print 'Setting Web root directory - %s' % WEBROOT
 #TODO Maybe put some of these methods in the WebServer so we can access self.path?
 
 def get_template(path_name=None, params=None):
     """Parameters: [title (String), navbar_active[key], breadcrumbs
     main_container(content)]"""
+    print 'get_template on %s' % path_name
     hidden_files = False
     sd = {}
-    p = path_name.split('.')[0]
-    print p, params
+
+    p = path_name.split('.')[0].strip('/')
+    print 'Template path - %s  parameters - %s' %(p, params)
     sd['title'] = p
     sd['navbar_active'] = md.navbar_active[p]
     if params is not None and p == 'minds':
@@ -111,8 +114,9 @@ def breadcrumber(t):
     for parts in root_path.split(os.path.sep):
         breadcrumb.append(parts)
 
-    if breadcrumb[0] == '':
-        breadcrumb.pop(0)
+    # TODO Check this on windows for regressions
+    #if breadcrumb[0] == '':
+    #    breadcrumb.pop(0)
 
     for b in range(len(breadcrumb)):
         pd = {
@@ -134,11 +138,13 @@ def breadcrumber(t):
 
 
 def get_file(file_name):
-    #TODO CR: fix to use 'with open()'
-    f = open(WEBROOT + file_name)
-    file_string = f.read()
-    m = mimetypes.guess_type(WEBROOT + file_name)
-    f.close()
+    file_path = os.path.join(WEBROOT + file_name)
+    print 'Reading file from file system - %s' % file_path
+    with open(file_path, "rb") as read_handle:
+
+        file_string = read_handle.read()
+    m = mimetypes.guess_type(file_name)
+    print 'Mimetype guessed - %s for file %s' % (m, file_name)
     return [m[0], file_string]
 
 
@@ -152,27 +158,29 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
         #TODO CR: Use a proper logger
-        #print self.path
+        url_path = urllib.unquote(self.path)
+        parsed_url = url_path.split('.')[-1]
+        print 'decoded - %s' % url_path     
+   
         try:
-            if self.path.endswith('.html'):
-                h = get_template(self.path.strip('/'))
+            if url_path.endswith('.html'):
+                h = get_template(url_path.strip('/'))
                 self.send_response(200)
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.wfile.write(h)
 
-            elif len(self.path.split('?')) > 1:
-                g = self.path.split('?')
-                print g
-                h = get_template(g[0].strip('/'), g[1])
+            elif len(url_path.split('?')) > 1:
+                g = url_path.split('?')
+                h = get_template(g[0], g[1])
                 self.send_response(200)
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.wfile.write(h)
 
-            else:
-                c = get_file(self.path)
-                print "Retreiving file - %s" % self.path
+            elif parsed_url in md.WEB_FILES:
+                c = get_file(url_path)
+                print "Retrieving file - %s" % url_path
                 self.send_response(200)
                 self.send_header("Content-type", c[0])
                 self.end_headers()
@@ -185,6 +193,7 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
     def do_POST(self):
+        url_path = urllib.unquote(self.path)
         self.send_response(200)
         self.send_header("Content-type", 0)
         self.end_headers()

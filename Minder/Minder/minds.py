@@ -9,6 +9,7 @@ import json
 import mimetypes
 from functools import reduce
 import minder_config as mc
+from urllib import quote
 
 
 MIND_DIR = '.mind'
@@ -91,26 +92,39 @@ def interrogate(mind_path, mind_dir=None, hidden_files=False):
     """
     Creates a nested dictionary that represents the folder structure of mind_path
     """
-    print hidden_files
+    ignore_list = M_CONFIG['system']['ignored_directories']
     folder_list = []
     file_list = []
+    # I know, let's wrap this thing in a ridiculous try/except block
+    # to deal with M$ Windows and all the moronic symlinked directories sprinkled
+    # all over the "User" directory! Mr. Balmer, you owe me 5 hours for this crap.
+    try:
+        directory_list = os.listdir(mind_path)
+        
+        for node in directory_list:
+            node_path = os.path.join(mind_path, node)
 
-    for node in os.listdir(mind_path):
-        node_path = os.path.join(mind_path, node)
+            if os.path.isfile(node_path) is True:
+                if hidden_files is False and node.startswith('.') is False and node not in ignore_list:
+                    file_list.append(node)
 
-        if os.path.isfile(node_path) is True:
-            if hidden_files is False and node.startswith('.') is False:
-                file_list.append(node)
+                if hidden_files is True:
+                    file_list.append(node)
 
-            if hidden_files is True:
-                file_list.append(node)
+            if os.path.isdir(node_path) is True:
+                if hidden_files is False and node.startswith('.') is False and node not in ignore_list:
+                    folder_list.append(node)
 
-        if os.path.isdir(node_path) is True:
-            if hidden_files is False and node.startswith('.') is False:
-                folder_list.append(node)
+                if hidden_files is True:
+                    folder_list.append(node)
+    
+          
+    except:
+        if mc.SYSTEM.startswith('win'):
+            print "Microsoft, in their infinite wisdom, has forbidden you from looking at %s" % mind_path
+        else:
+            print "IOError - Check permissions for folders - %s" % mind_path
 
-            if hidden_files is True:
-                folder_list.append(node)
 
     folder_list.sort()
     file_list.sort()
@@ -128,12 +142,12 @@ def interrogate(mind_path, mind_dir=None, hidden_files=False):
 
     mind_dir = {
         "root": os.path.split(mind_path)[0],
+        "url": quote(mind_path),
         "name": os.path.split(mind_path)[-1],
         "files": file_dict_list,
         "folders": folder_dict_list
     }
-    #ji = json.dumps(mind_dir, indent=4, sort_keys=True)
-    #result = json.loads(ji)
+
     return mind_dir
 
 

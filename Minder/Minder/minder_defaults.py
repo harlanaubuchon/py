@@ -8,8 +8,13 @@ DEFAULT_CONFIG = {
                          "file_size_limit_in_kilobytes": 300000,
                          "show_hidden_files": False,
                          },
-                     "minds": {}
+                     "minds": {},
+                     "system": {
+                         "ignored_directories": 'AppData, Application Data, Cookies, Local Settings',
+                         }
                      }
+
+WEB_FILES = ['html', 'css', 'js', 'eot', 'svg', 'ttf', 'woff', 'png']
 
 # parameters: [title (String), navbar_active[key], main_container(content)]
 main_template = """<!DOCTYPE html>
@@ -29,7 +34,7 @@ main_template = """<!DOCTYPE html>
     <link href="../css/bootstrap.override.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link rel="stylesheet" type="text/css" href="./css/css-ninja-styles.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="../css/css-ninja-styles.css" media="screen">
     <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
     <!--<link href="navbar-fixed-top.css" rel="stylesheet">-->
 
@@ -140,6 +145,42 @@ home = """
 remotes = """
 <legend>${section}</legend>
 <p>This is the remotes page.</p>
+<form class="form-horizontal">
+<fieldset>
+
+<!-- Form Name -->
+<legend>Form Name</legend>
+
+<!-- Button (Double) -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="button1id">Double Button</label>
+  <div class="col-md-8">
+    <button id="button1id" name="button1id" class="btn btn-success">Good Button</button>
+    <button id="button2id" name="button2id" class="btn btn-danger">Scary Button</button>
+  </div>
+</div>
+
+<!-- Multiple Checkboxes -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="checkboxes">Multiple Checkboxes</label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="checkboxes-0">
+      <input type="checkbox" name="checkboxes" id="checkboxes-0" value="1">
+      Option one
+    </label>
+	</div>
+  <div class="checkbox">
+    <label for="checkboxes-1">
+      <input type="checkbox" name="checkboxes" id="checkboxes-1" value="2">
+      Option two
+    </label>
+	</div>
+  </div>
+</div>
+
+</fieldset>
+</form>
 """
 
 minds = """<legend>Minds</legend>
@@ -150,7 +191,7 @@ minds = """<legend>Minds</legend>
 
 begin_folders_template = """
         <li class="tree">
-            <label for="${name}"><a href="minds?root=${root}/${name}">${name}</a></label><input type="checkbox" id="${name}"/>
+            <label for="${name}"><a href="minds?root=${url}">${name}</a></label><input type="checkbox" id="${name}"/>
             <ol>
 """
 
@@ -311,7 +352,7 @@ breadcrumbs = """
 """
 
 breadcrumb_refs = """
-          <li><a href="/minds?root=/${path}">${name}</a></li>
+          <li><a href="/minds?root=${path}">${name}</a></li>
 """
 
 breadcrumb_active = """

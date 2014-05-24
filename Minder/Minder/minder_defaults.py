@@ -2,17 +2,26 @@
 __author__ = 'harlanaubuchon'
 
 DEFAULT_CONFIG = {
-                     "defaults": {
-                         "space_remaining_threshold_bytes": 2048,
-                         "text_difference_threshold_percentage": 99,
-                         "file_size_limit_in_kilobytes": 300000,
-                         "show_hidden_files": False,
-                         },
-                     "minds": {},
-                     "system": {
-                         "ignored_directories": 'AppData, Application Data, Cookies, Local Settings',
-                         }
-                     }
+                 "Settings": {
+                              "space_remaining_threshold_bytes": 2048,
+                              "text_difference_threshold_percentage": 99,
+                              "file_size_limit_kilobytes": 300000,
+                              "show_hidden_files_boolean": False,
+                              },
+                 "Minds": {},
+                 "System": {
+                            "ignored_directories_list": 'AppData, Application Data, Cookies, Local Settings',
+                            }
+                 }
+
+CONFIG_UOM = {
+            "percentage": {"uom": "%", "type": "number"},
+            "bytes": {"uom": "B", "type": "number"},
+            "kilobytes": {"uom": "KB", "type": "number"},
+            "boolean": {"uom": None, "type": "select", "options": ['True', 'False']},
+            "text": {"uom": None, "type": "text"},
+            "list": {"uom": None, "type": "text"},
+            }
 
 WEB_FILES = ['html', 'css', 'js', 'eot', 'svg', 'ttf', 'woff', 'png']
 
@@ -106,27 +115,40 @@ navbar_active = {"minds": """
 
 # Expects dictionary with array of values (section, key, type as [text, number], value)
 settings = """
-<form class="form-horizontal" method="POST" id="form">
+<form class="form-horizontal" method="POST" id="${section}">
  <fieldset>
  <legend>${section}</legend>
-  ${form_groups}
-  <div class="form-actions">
-     <button class="btn btn-primary" type="submit">Save</button>
-  </div>
+
+    ${form_groups}
+
+    <div class="form-group">
+        <div class="col-sm-6 input-group">
+             <button class="btn btn-primary" type="submit" name="section" value="${section}">Save</button>
+        </div>
+    </div>
  </fieldset>
 </form>
-<br>
 """
 
 form_group = """
 <div class="form-group">
     <label for="${type}" class="col-sm-4 control-label">${label}</label>
     <div class="col-sm-6 input-group">
-        <input type="${type}" class="form-control" id="${type}" name="${key}" placeholder="${value}">
-        <span class="input-group-addon">${uom}</span>
+
+        ${form_items}
+
     </div>
 </div>
 """
+
+form_item = {"select": """<select class="form-control" type="${type}" id="${type}" name="${key}" value="${value}">${select_options}</select>""",
+             "text": """<input type="${type}" class="form-control" id="${type}" name="${key}" value="${value}">""",
+             "number": """<input type="${type}" class="form-control" id="${type}" name="${key}" value="${value}">""",
+             "uom": """<span class="input-group-addon">${uom}</span>"""
+             }
+
+form_select_options = """<option value="${option}"${selected}>${option}</option>"""
+
 
 # Parameters: None
 home = """
@@ -143,39 +165,95 @@ home = """
 
 # Expects dictionary with array of values (section, key, type as [text, number], value)
 remotes = """
-<legend>${section}</legend>
-<p>This is the remotes page.</p>
+<div class="container theme-showcase" role="main">
+
+<form class="form-horizontal" method="POST" id="new_mind">
+ <fieldset>
+ <legend>minds</legend>
+
+<div class="form-group">
+    <label for="text" class="col-sm-4 control-label">This Is A Name</label>
+    <div class="col-sm-6 input-group">
+        <input type="text" class="form-control" id="text" name="this_is_a_name" placeholder="/path/to/something">
+        <span class="input-group-addon">None</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="text" class="col-sm-4 control-label">This Is Another Name</label>
+    <div class="col-sm-6 input-group">
+        <input type="text" class="form-control" id="text" name="this_is_another_name" placeholder="/path/to/something/else">
+        <span class="input-group-addon">None</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="text" class="col-sm-4 control-label">Show hidden files</label>
+    <div class="col-sm-6 input-group">
+         <select class="form-control" type="text" id="text" name="show_hidden_files_boolean" value="True">
+            <option>True</option>
+            <option>False</option>
+         </select>
+    </div>
+</div>
+<div class="form-group">
+    <div class="input-group">
+         <button class="btn btn-primary" type="submit" name="section" value="new_mind">Save</button>
+    </div>
+</div>
+ </fieldset>
+</form>
+<br>
+
 <form class="form-horizontal">
 <fieldset>
 
 <!-- Form Name -->
 <legend>Form Name</legend>
 
-<!-- Button (Double) -->
+<!-- Text input-->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="button1id">Double Button</label>
-  <div class="col-md-8">
-    <button id="button1id" name="button1id" class="btn btn-success">Good Button</button>
-    <button id="button2id" name="button2id" class="btn btn-danger">Scary Button</button>
+  <label class="col-md-4 control-label" for="textinput">Text Input</label>
+  <div class="col-md-4">
+  <input id="textinput" name="textinput" type="text" placeholder="placeholder" class="form-control input-md">
+  <span class="help-block">help</span>
   </div>
 </div>
 
-<!-- Multiple Checkboxes -->
+<!-- Text input-->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="checkboxes">Multiple Checkboxes</label>
+  <label class="col-md-4 control-label" for="textinput">Text Input</label>
   <div class="col-md-4">
-  <div class="checkbox">
-    <label for="checkboxes-0">
-      <input type="checkbox" name="checkboxes" id="checkboxes-0" value="1">
-      Option one
-    </label>
-	</div>
-  <div class="checkbox">
-    <label for="checkboxes-1">
-      <input type="checkbox" name="checkboxes" id="checkboxes-1" value="2">
-      Option two
-    </label>
-	</div>
+  <input id="textinput" name="textinput" type="text" placeholder="placeholder" class="form-control input-md">
+  <span class="help-block">help</span>
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="textinput">Text Input</label>
+  <div class="col-md-4">
+  <input id="textinput" name="textinput" type="text" placeholder="placeholder" class="form-control input-md">
+  <span class="help-block">help</span>
+  </div>
+</div>
+
+<!-- Select Basic -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="selectbasic">Select Basic</label>
+  <div class="col-md-4">
+    <select id="selectbasic" name="selectbasic" class="form-control">
+      <option value="True">True</option>
+      <option value="False">False</option>
+    </select>
+  </div>
+</div>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="singlebutton">Single Button</label>
+  <div class="col-md-4">
+    <button id="singlebutton" name="singlebutton" class="btn btn-primary btn-sm">Button</button>
   </div>
 </div>
 
@@ -205,9 +283,9 @@ end_folders_template = """
 
 empty_files_template = """<li class="file"><span class="empty">(empty)</span></li>"""
 
-config = """{
-    "config": [
-        {"section":
+config ="""{
+             "sections": [
+
             {
             "name": "Settings",
             "items": [
@@ -233,16 +311,16 @@ config = """{
                 "uom": "kilobytes"
                 },
                 {
-                "key": "show_hidden_files",
+                "key": "show_hidden_files_boolean",
                 "value": "True",
-                "type": "text",
+                "type": "checkbox",
                 "label": "Show Hidden Files",
                 "uom": null
                 }
             ]
-          }
-        },
-        {"section":
+          },
+
+
             {
             "name": "minds",
             "items": [
@@ -262,7 +340,6 @@ config = """{
                  }
             ]
         }
-      }
     ]
 }"""
 
@@ -469,3 +546,22 @@ mind = {
     "name": "x",
     "root": "/home/harlanaubuchon/z"
 }
+
+
+form_mind_ext_section = """
+<div class="form-group">
+    <label for="checkboxes" class="col-md-4 control-label">${mime_section}</label>
+    <div class="col-md-4">
+
+        ${form_mind_file_ext}
+
+</div>
+"""
+
+form_mind_file_ext = """
+		  <div class="checkbox">
+			<label for="checkboxes-0">
+			  <input type="checkbox" name="checkboxes" id="${file_ext}" value="1">
+			  ${file_ext}
+			</label>
+		  </div>"""

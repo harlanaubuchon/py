@@ -2,7 +2,7 @@ import time
 import os
 import BaseHTTPServer
 import webbrowser
-import json
+import time
 from string import Template
 import minder_config as mc
 import minder_defaults as md
@@ -18,25 +18,27 @@ WEBROOT = os.path.join(CUR_DIR, 'webroot')
 mit = Template(md.minds)
 methods_list = {
     'home': 'md.home',
-    'index': 'md.index',
+    'index': 'md.home',
     'settings': 'expand_settings()',
-    'minds': 'mit.substitute(iter_folders(md.mind, hidden_files=False))',
+    'minds': 'mit.substitute(iter_folders(minds.interrogate(mc.USER_DIRECTORY)))',
     'remotes': 'md.remotes'
 }
 print 'Setting Web root directory - %s' % WEBROOT
 #TODO Maybe put some of these methods in the WebServer so we can access self.path?
 
+
 def get_template(path_name=None, params=None):
     """Parameters: [title (String), navbar_active[key], breadcrumbs
     main_container(content)]"""
-    print 'get_template on %s' % path_name
-    hidden_files = False
+    #print 'get_template on %s' % path_name
+    hidden_files = eval(mc.minderconfig()['Settings']['show_hidden_files_boolean'])
+    print 'get_template hidden_file is %s' % repr(hidden_files)
     sd = {}
-
     p = path_name.split('.')[0].strip('/')
-    print 'Template path - %s  parameters - %s' %(p, params)
+    #print 'Template path - %s  parameters - %s' %(p, params)
     sd['title'] = p
     sd['navbar_active'] = md.navbar_active[p]
+
     if params is not None and p == 'minds':
         pm = params.split('=')[1]
         minds_dict = minds.interrogate(pm, hidden_files)
@@ -54,24 +56,52 @@ def get_template(path_name=None, params=None):
 
     mt = Template(md.main_template)
     html_string = mt.substitute(sd)
+
     return html_string
 
 
 def expand_settings():
-    config_dict = json.loads(md.config)
+    config_uom = md.CONFIG_UOM
+    config_dict = mc.read_minder_settings()
+    fo = Template(md.form_select_options)
+    fi = Template(md.form_item['text'])
     ft = Template(md.form_group)
     st = Template(md.settings)
     final_html = ""
-    for section in config_dict['config']:
+    for section in config_dict['sections']:
         form_builder = {
-                        "section": None,
+                        "section": section['name'],
                         "form_groups": ""
-        }
+                        }
 
-        form_builder['section'] = section['section']['name']
-        for i in section['section']['items']:
+        for i in section['items']:
+            select_options = ""
+            key_type = i['key'].split('_')[-1]
+            template_item = md.form_item[i['type']]
+
+            if i['type'] == 'select':
+                value_list = list(config_uom[key_type]['options'])
+                selected_value = {
+                                  "option": value_list.pop(value_list.index(i['value'])),
+                                  "selected": " selected"
+                                  }
+                select_options += fo.substitute(selected_value)
+                for option in value_list:
+                    select_options += fo.substitute({'option': option, 'selected': ''})
+
+            if i['uom'] is not None:
+                template_item += md.form_item['uom']
+            else:
+                pass
+
+            i["select_options"] = select_options
+            fi = Template(template_item)
+            i["form_items"] = fi.substitute(i)
             form_builder['form_groups'] += ft.substitute(i)
         final_html += st.substitute(form_builder)
+
+
+
     return final_html
 
 
@@ -139,12 +169,12 @@ def breadcrumber(t):
 
 def get_file(file_name):
     file_path = os.path.join(WEBROOT + file_name)
-    print 'Reading file from file system - %s' % file_path
+    #print 'Reading file from file system - %s' % file_path
     with open(file_path, "rb") as read_handle:
 
         file_string = read_handle.read()
     m = mimetypes.guess_type(file_name)
-    print 'Mimetype guessed - %s for file %s' % (m, file_name)
+    #print 'Mimetype guessed - %s for file %s' % (m, file_name)
     return [m[0], file_string]
 
 
@@ -160,7 +190,7 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
         #TODO CR: Use a proper logger
         url_path = urllib.unquote(self.path)
         parsed_url = url_path.split('.')[-1]
-        print 'decoded - %s' % url_path     
+        #print 'decoded - %s' % url_path
    
         try:
             if url_path.endswith('.html'):
@@ -180,7 +210,7 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
 
             elif parsed_url in md.WEB_FILES:
                 c = get_file(url_path)
-                print "Retrieving file - %s" % url_path
+                #print "Retrieving file - %s" % url_path
                 self.send_response(200)
                 self.send_header("Content-type", c[0])
                 self.end_headers()
@@ -194,17 +224,32 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_POST(self):
         url_path = urllib.unquote(self.path)
-        self.send_response(200)
-        self.send_header("Content-type", 0)
-        self.end_headers()
         content_length = int(self.headers.getheader('content-length'))
         post_body = self.rfile.read(content_length)
-        print post_body
+        #print post_body
         post_params = post_body.split('&')
         param_dict = {}
+
         for i in post_params:
-            param_dict[i.split('=')[0]] = i.split('=')[1]
-        print param_dict
+            parsed_i = urllib.unquote(i)
+            parsed_i = parsed_i.replace('+', ' ')
+            param_dict[parsed_i.split('=')[0]] = parsed_i.split('=')[1]
+        print url_path, param_dict
+
+        if url_path == '/settings.html':
+            section = {param_dict.pop('section'): param_dict}
+            mc.minderconfig(section, update=True)
+            time.sleep(1)
+            h = get_template(url_path.strip('/'))
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(h)
+
+        else:
+            self.send_response(404)
+            self.send_header("Content-type", 0)
+            self.end_headers()
 
 
 if __name__ == '__main__':

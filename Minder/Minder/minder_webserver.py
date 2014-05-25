@@ -51,6 +51,7 @@ def get_template(path_name=None, params=None):
         sd['breadcrumbs'] = breadcrumber(minds_dict)
 
     else:
+        print "EMPTY METHOD CALL - %s" % p
         sd['main_container'] = eval(methods_list[p])
         sd['breadcrumbs'] = breadcrumber({'root': '', 'name': p})
 
@@ -67,9 +68,13 @@ def expand_settings():
     fi = Template(md.form_item['text'])
     ft = Template(md.form_group)
     st = Template(md.settings)
+    pt = Template(md.panel_group)
     final_html = ""
+    section_html= ""
     for section in config_dict['sections']:
+
         form_builder = {
+                        "title": "Settings",
                         "section": section['name'],
                         "form_groups": ""
                         }
@@ -98,8 +103,10 @@ def expand_settings():
             fi = Template(template_item)
             i["form_items"] = fi.substitute(i)
             form_builder['form_groups'] += ft.substitute(i)
-        final_html += st.substitute(form_builder)
 
+        section_html += st.substitute(form_builder)
+
+    final_html += pt.substitute({'title': 'Settings', 'panels': section_html})
 
 
     return final_html

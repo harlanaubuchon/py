@@ -113,8 +113,52 @@ navbar_active = {"minds": """
             <li><a href="settings.html">Settings</a></li>
             """}
 
-# Expects dictionary with array of values (section, key, type as [text, number], value)
+panel_group = """
+<div class="container theme-showcase" role="main">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <div class="panel-group" id="panel-${title}">
+
+                ${panels}
+
+            </div>
+        </div>
+    </div>
+</div><!-- container -->
+"""
+
+
 settings = """
+<div class="panel panel-default">
+    <div class="panel-heading">
+         <a class="panel-title" data-toggle="collapse" data-parent="#panel-${title}" href="#panel-element-${section}">${section}</a>
+    </div>
+    <div id="panel-element-${section}" class="panel-collapse collapse">
+        <div class="panel-body">
+
+
+            <form class="form-horizontal" method="POST" id="${section}">
+             <fieldset>
+
+                ${form_groups}
+
+                <div class="form-group">
+                    <div class="col-sm-6 input-group">
+                         <button class="btn btn-primary" type="submit" name="section" value="${section}">Save</button>
+                    </div>
+                </div>
+             </fieldset>
+            </form>
+
+
+        </div>
+    </div>
+</div>
+"""
+
+
+# Expects dictionary with array of values (section, key, type as [text, number], value)
+settings_old = """
 <form class="form-horizontal" method="POST" id="${section}">
  <fieldset>
  <legend>${section}</legend>

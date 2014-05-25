@@ -105,7 +105,7 @@ def _read_minder_config():
 
     else:
         raise OSError
-
+    print "_read_minder_config - hidden_files %s" % parser.get('Settings', 'show_hidden_files_boolean')
     return M_CONFIG
 
 

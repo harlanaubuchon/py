@@ -58,7 +58,10 @@ def mind(mind_path, refresh=False):
     return mind_palace
 
 
-def _file_obj(path, hidden_files=False):
+def _file_obj(path, hidden_files):
+    if hidden_files is None:
+        hidden_files = False
+
     size_limit = int(M_CONFIG['Settings']['file_size_limit_kilobytes'])
     file_name = os.path.split(path)[-1]
     file_size = int(os.path.getsize(path))
@@ -89,10 +92,12 @@ def _file_obj(path, hidden_files=False):
     return mind_file
 
 
-def interrogate(mind_path, mind_dir=None, hidden_files=False):
+def interrogate(mind_path, hidden_files, mind_dir=None):
     """
     Creates a nested dictionary that represents the folder structure of mind_path
     """
+    if hidden_files is None:
+        hidden_files = False
     ignore_list = M_CONFIG['System']['ignored_directories_list']
     folder_list = []
     file_list = []

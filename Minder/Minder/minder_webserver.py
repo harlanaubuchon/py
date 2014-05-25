@@ -19,8 +19,8 @@ mit = Template(md.minds)
 methods_list = {
     'home': 'md.home',
     'index': 'md.home',
-    'settings': 'expand_settings()',
-    'minds': 'mit.substitute(iter_folders(minds.interrogate(mc.USER_DIRECTORY)))',
+    'settings': "expand_sections('settings')",
+    'minds': "expand_sections('minds')",  # 'mit.substitute(iter_folders(minds.interrogate(mc.USER_DIRECTORY)))',
     'remotes': 'md.remotes'
 }
 print 'Setting Web root directory - %s' % WEBROOT
@@ -38,13 +38,13 @@ def get_template(path_name=None, params=None):
     sd['title'] = p
     sd['navbar_active'] = md.navbar_active[p]
 
-    if params is not None and p == 'minds':
+    if params is not None and p == 'mind':
         pm = params.split('=')[1]
         minds_dict = minds.interrogate(pm, hidden_files)
         sd['main_container'] = mit.substitute(iter_folders(minds_dict))
         sd['breadcrumbs'] = breadcrumber(minds_dict)
 
-    elif params is None and p == 'minds':
+    elif params is None and p == 'mind':
         minds_dict = minds.interrogate(mc.USER_DIRECTORY, hidden_files)
         sd['main_container'] = mit.substitute(iter_folders(minds_dict))
         sd['breadcrumbs'] = breadcrumber(minds_dict)
@@ -60,22 +60,36 @@ def get_template(path_name=None, params=None):
     return html_string
 
 
-def expand_settings():
+def expand_sections(url_path, sections_dict=None):
+    """
+    :param url_path: str(Web page path)
+    :param sections_dict: dict(Minder "sections" dictionary)
+    :rtype : str -> html main container
+    """
     config_uom = md.CONFIG_UOM
-    config_dict = mc.read_minder_settings()
+    if url_path == 'minds':
+        sections_dict = mc.read_minder_settings(md.minds_section_dict)
+        panel_template = md.minds_panel_group
+
+    if url_path == 'settings':
+        sections_dict = mc.read_minder_settings(mc.minderconfig())
+        panel_template = md.panel_group
+
     fo = Template(md.form_select_options)
     fi = Template(md.form_item['text'])
     ft = Template(md.form_group)
     st = Template(md.settings)
-    pt = Template(md.panel_group)
+    pt = Template(panel_template)
     final_html = ""
-    section_html= ""
-    for section in config_dict['sections']:
-
+    section_html = ""
+    panel_id = -1
+    for section in sections_dict['sections']:
+        panel_id = panel_id + 1
         form_builder = {
-                        "title": "Settings",
+                        "title": url_path,
                         "section": section['name'],
-                        "form_groups": ""
+                        "form_groups": "",
+                        "panel_id": panel_id
                         }
 
         for i in section['items']:
@@ -105,8 +119,7 @@ def expand_settings():
 
         section_html += st.substitute(form_builder)
 
-    final_html += pt.substitute({'title': 'Settings', 'panels': section_html})
-
+    final_html += pt.substitute({'title': url_path, 'panels': section_html})
 
     return final_html
 

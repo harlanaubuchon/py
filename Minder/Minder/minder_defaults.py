@@ -131,9 +131,9 @@ panel_group = """
 settings = """
 <div class="panel panel-default">
     <div class="panel-heading">
-         <a class="panel-title" data-toggle="collapse" data-parent="#panel-${title}" href="#panel-element-${section}">${section}</a>
+         <a class="panel-title" data-toggle="collapse" data-parent="#panel-${title}" href="#panel-element-${panel_id}">${section}</a>
     </div>
-    <div id="panel-element-${section}" class="panel-collapse collapse">
+    <div id="panel-element-${panel_id}" class="panel-collapse collapse">
         <div class="panel-body">
 
 
@@ -304,8 +304,8 @@ minds_panel = """
                         </div>
 """
 
-new_minds_panel = ""
-remotes = """
+remotes = ""
+minds_panel_group = """
        <div class="container theme-showcase" role="main">
             <div class="row clearfix">
 
@@ -320,7 +320,7 @@ remotes = """
                                 <div class="panel-body">
 
 
-                                    <form class="form-horizontal" method="POST" id="form">
+                                    <form class="form-horizontal" method="POST" id="new_mind">
                                         <fieldset>
                                             <div class="row clearfix">
                                                 <div class="col-md-6 column">
@@ -335,7 +335,7 @@ remotes = """
                                                             </div>
                                                         </div>
 
-                                                        ${folders_template}
+                                                        #origin_folders_template
 
                                                     </div>
                                                     <div class="row clearfix">
@@ -349,7 +349,7 @@ remotes = """
                                                             </div>
                                                         </div>
 
-                                                        ${folders_template}
+                                                        #destination_folders_template
 
                                                     </div>
                                                 </div>
@@ -398,3 +398,14 @@ remotes = """
             </div>
         </div><!-- container -->
         """
+
+minds_section_dict = {
+    'Name of Another Mind@/home/nyk/My Documents': {
+        'destination': '/home/User/My Documents/PDF',
+        'file_extensions': '.txt, .pdf, .doc, .docx'
+    },
+    'Name_of_Another_Mind@/home/nyk/Downloads': {
+        'destination': '/home/User/Directory/TXT',
+        'file_extensions': '.txt, .pdf, .doc, .docx'
+    }
+}

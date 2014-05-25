@@ -50,8 +50,7 @@ def minderconfig(minder_config=None, update=False):
     return minder_config
 
 
-def read_minder_settings(as_json=False):
-    m_config = minderconfig()
+def read_minder_settings(m_config, as_json=False):
     config_uom = md.CONFIG_UOM
     json_dict= {'sections': []}
 
@@ -77,7 +76,7 @@ def read_minder_settings(as_json=False):
                         "value": str(v),
                         "type": config_uom['text']['type'],
                         "label": (' ').join(label).capitalize(),
-                        "uom": config_uom[['text']]['uom']
+                        "uom": config_uom['text']['uom']
                         }
             config_items['items'].append(config_item)
 

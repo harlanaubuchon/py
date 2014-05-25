@@ -58,9 +58,15 @@ def mind(mind_path, refresh=False):
     return mind_palace
 
 
-def _file_obj(path, hidden_files):
-    if hidden_files is None:
-        hidden_files = False
+def recollect(mind_path):
+    if mind_path is None:
+        mind_path = mc.MINDER_HOME
+
+
+
+def _file_obj(path, deep=None):
+    if deep is None:
+        deep = False
 
     size_limit = int(M_CONFIG['Settings']['file_size_limit_kilobytes'])
     file_name = os.path.split(path)[-1]
@@ -68,8 +74,7 @@ def _file_obj(path, hidden_files):
 
     checksum = None
 
-    #TODO This if statement is misplaced check recent local merges
-    if hidden_files is True:
+    if deep is True:
         if file_size < size_limit:
             with open(path) as file_handle:
                 file_data = file_handle.read()
@@ -92,12 +97,15 @@ def _file_obj(path, hidden_files):
     return mind_file
 
 
-def interrogate(mind_path, hidden_files, mind_dir=None):
+def interrogate(mind_path, hidden_files, deep=None, mind_dir=None):
     """
+    minds.interrogate(mind_path=File path, hidden_file=Look for '.name' files, deep=Perform md5 checksum)
     Creates a nested dictionary that represents the folder structure of mind_path
     """
     if hidden_files is None:
         hidden_files = False
+    if deep is None:
+        deep = False
     ignore_list = M_CONFIG['System']['ignored_directories_list']
     folder_list = []
     file_list = []
@@ -140,11 +148,11 @@ def interrogate(mind_path, hidden_files, mind_dir=None):
 
     for file_name in file_list:
         file_path = os.path.join(mind_path, file_name)
-        file_dict_list.append(_file_obj(file_path, hidden_files))
+        file_dict_list.append(_file_obj(file_path, deep))
 
     for folder_name in folder_list:
         file_path = os.path.join(mind_path, folder_name)
-        folder_dict_list.append(interrogate(file_path, hidden_files))
+        folder_dict_list.append(interrogate(file_path, hidden_files, deep))
 
     mind_dir = {
         "root": os.path.split(mind_path)[0],
@@ -157,17 +165,21 @@ def interrogate(mind_path, hidden_files, mind_dir=None):
     return mind_dir
 
 
-def _write_mind_palace(mind_path, mind_palace):
-    je = json.JSONEncoder(indent=4, sort_keys=True, encoding="utf-8")
-    file_path = os.path.join(mind_path, MIND_FILE)
+def _write_mind_palace(mind_path, mind_palace, mind_name=None):
+    je = json.JSONEncoder(indent=4, sort_keys=True)
+    if mind_name is None:
+        mind_name = MIND_FILE
+    file_path = os.path.join(mind_path, mind_name)
     with open(file_path, 'w') as write_handle:
         json_dir = je.encode(mind_palace)
         write_handle.write(json_dir)
 
 
-def _read_mind_palace(mind_path):
-    jd = json.JSONDecoder(encoding="utf-8")
-    file_path = os.path.join(mind_path, MIND_FILE)
+def _read_mind_palace(mind_path, mind_name=None):
+    jd = json.JSONDecoder()
+    if mind_name is None:
+        mind_name = MIND_FILE
+    file_path = os.path.join(mind_path, mind_name)
     with open(file_path) as read_handle:
         json_string = read_handle.read()
         json_dir = jd.decode(json_string)

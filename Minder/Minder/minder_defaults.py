@@ -32,8 +32,8 @@ main_template = """<!DOCTYPE html>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="Minder Is Not a DVCS Enhanced Repository">
+    <meta name="author" content="Harlan AuBuchon - https://github.com/harlanaubuchon">
     <link rel="shortcut icon" type="image/png" href="../images/py.png" />
 
     <title>${title}</title>
@@ -63,11 +63,11 @@ main_template = """<!DOCTYPE html>
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+            <span class="glyphicon glyphicon-th-large" style="color:#fff"></span>
           </button>
-          <a class="navbar-brand" href="/home.html">Minder</a>
+          <button type="button" class="btn btn-harlan btn-lg">
+            <span class="glyphicon glyphicon-eye-open"></span> Minder
+          </button>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -76,9 +76,9 @@ main_template = """<!DOCTYPE html>
         </div><!--/.nav-collapse -->
         ${breadcrumbs}
       </div>
-      <div class="container theme-showcase" role="main">
+
         ${main_container}
-      </div> <!-- /container -->
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -158,21 +158,6 @@ settings = """
 
 
 # Expects dictionary with array of values (section, key, type as [text, number], value)
-settings_old = """
-<form class="form-horizontal" method="POST" id="${section}">
- <fieldset>
- <legend>${section}</legend>
-
-    ${form_groups}
-
-    <div class="form-group">
-        <div class="col-sm-6 input-group">
-             <button class="btn btn-primary" type="submit" name="section" value="${section}">Save</button>
-        </div>
-    </div>
- </fieldset>
-</form>
-"""
 
 form_group = """
 <div class="form-group">
@@ -208,108 +193,23 @@ home = """
 """
 
 # Expects dictionary with array of values (section, key, type as [text, number], value)
-remotes = """
+remotes_test = """
 <div class="container theme-showcase" role="main">
 
-<form class="form-horizontal" method="POST" id="new_mind">
- <fieldset>
- <legend>minds</legend>
-
-<div class="form-group">
-    <label for="text" class="col-sm-4 control-label">This Is A Name</label>
-    <div class="col-sm-6 input-group">
-        <input type="text" class="form-control" id="text" name="this_is_a_name" placeholder="/path/to/something">
-        <span class="input-group-addon">None</span>
-    </div>
 </div>
-
-<div class="form-group">
-    <label for="text" class="col-sm-4 control-label">This Is Another Name</label>
-    <div class="col-sm-6 input-group">
-        <input type="text" class="form-control" id="text" name="this_is_another_name" placeholder="/path/to/something/else">
-        <span class="input-group-addon">None</span>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="text" class="col-sm-4 control-label">Show hidden files</label>
-    <div class="col-sm-6 input-group">
-         <select class="form-control" type="text" id="text" name="show_hidden_files_boolean" value="True">
-            <option>True</option>
-            <option>False</option>
-         </select>
-    </div>
-</div>
-<div class="form-group">
-    <div class="input-group">
-         <button class="btn btn-primary" type="submit" name="section" value="new_mind">Save</button>
-    </div>
-</div>
- </fieldset>
-</form>
-<br>
-
-<form class="form-horizontal">
-<fieldset>
-
-<!-- Form Name -->
-<legend>Form Name</legend>
-
-<!-- Text input-->
-<div class="form-group">
-  <label class="col-md-4 control-label" for="textinput">Text Input</label>
-  <div class="col-md-4">
-  <input id="textinput" name="textinput" type="text" placeholder="placeholder" class="form-control input-md">
-  <span class="help-block">help</span>
-  </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-  <label class="col-md-4 control-label" for="textinput">Text Input</label>
-  <div class="col-md-4">
-  <input id="textinput" name="textinput" type="text" placeholder="placeholder" class="form-control input-md">
-  <span class="help-block">help</span>
-  </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-  <label class="col-md-4 control-label" for="textinput">Text Input</label>
-  <div class="col-md-4">
-  <input id="textinput" name="textinput" type="text" placeholder="placeholder" class="form-control input-md">
-  <span class="help-block">help</span>
-  </div>
-</div>
-
-<!-- Select Basic -->
-<div class="form-group">
-  <label class="col-md-4 control-label" for="selectbasic">Select Basic</label>
-  <div class="col-md-4">
-    <select id="selectbasic" name="selectbasic" class="form-control">
-      <option value="True">True</option>
-      <option value="False">False</option>
-    </select>
-  </div>
-</div>
-
-<!-- Button -->
-<div class="form-group">
-  <label class="col-md-4 control-label" for="singlebutton">Single Button</label>
-  <div class="col-md-4">
-    <button id="singlebutton" name="singlebutton" class="btn btn-primary btn-sm">Button</button>
-  </div>
-</div>
-
-</fieldset>
-</form>
 """
 
-minds = """<legend>Minds</legend>
+minds = """
+<div class="container theme-showcase" role="main">
+
+<legend>Minds</legend>
 <p>Choose a folder to Mind.</p>
     <ol class="tree">
         ${folders_template}
-    </ol>"""
+    </ol>
+
+</div> <!-- /container -->
+    """
 
 begin_folders_template = """
         <li class="tree">
@@ -327,144 +227,6 @@ end_folders_template = """
 
 empty_files_template = """<li class="file"><span class="empty">(empty)</span></li>"""
 
-config ="""{
-             "sections": [
-
-            {
-            "name": "Settings",
-            "items": [
-                {
-                "key": "text_difference_threshold_percentage",
-                "value": "99",
-                "type": "number",
-                "label": "Text Difference Threshold",
-                "uom": "percentage"
-                },
-                {
-                "key": "space_remaining_threshold_bytes",
-                "value": "2048",
-                "type": "number",
-                "label": "Space Remaining Threshold",
-                "uom": "bytes"
-                },
-                {
-                "key": "file_dif_size_limit_kilobytes",
-                "value": "300000",
-                "type": "number",
-                "label": "File Diff Size Limit",
-                "uom": "kilobytes"
-                },
-                {
-                "key": "show_hidden_files_boolean",
-                "value": "True",
-                "type": "checkbox",
-                "label": "Show Hidden Files",
-                "uom": null
-                }
-            ]
-          },
-
-
-            {
-            "name": "minds",
-            "items": [
-                {"key": "this_is_a_name",
-                 "value": "/path/to/something",
-                 "type": "text",
-                 "label": "This Is A Name",
-                 "file_types": "(text, pdf, doc, docx)",
-                 "uom": null
-                 },
-                 {"key": "this_is_another_name",
-                 "value": "/path/to/something/else",
-                 "type": "text",
-                 "label": "This Is Another Name",
-                 "file_types": "(mp3, mp4, wav)",
-                 "uom": null
-                 }
-            ]
-        }
-    ]
-}"""
-
-mind_old = {
-    "root": "/home/harlanaubuchon/",
-    "name": "x",
-    "files": [],
-    "folders": [
-                {
-                 "root": "/home/harlanaubuchon/x/",
-                 "name": "y1",
-                 "folders": [
-                             {
-                             "root": "/home/harlanaubuchon/x/y1/",
-                             "name": "y1_2",
-                             "folders": [],
-                             "files": []
-                             }
-                             ],
-                 "files": [
-                           {
-                           "name": "y0.txt",
-                           "mime_type": "text/plain",
-                           "size": 100,
-                           "checksum": "c873loihagkjhsdo8y98wqyeshdlkahs"
-                           },
-                           {
-                           "name": "y1.txt",
-                           "mime_type": "text/plain",
-                           "size": 99,
-                           "checksum": "b873loihagkjhsdo8y98wqyeshdlkahs"
-                           },
-                           {
-                           "name": "y2.txt",
-                           "mime_type": "text/plain",
-                           "size": 98,
-                           "checksum": "a873loihagkjhsdo8y98wqyeshdlkahs"
-                           }
-                           ]
-                 },
-                {
-                 "root": "/home/harlanaubuchon/x/",
-                 "name": "y2",
-                 "folders": [
-                            {
-                             "root": "/home/harlanaubuchon/x/y2/",
-                             "name": "y2_1",
-                             "folders": [],
-                             "files": [
-                                       {
-                                       "name": "y3.txt",
-                                       "mime_type": "text/plain",
-                                       "size": 97,
-                                       "checksum": "d873loihagkjhsdo8y98wqyeshdlkahs"
-                                       },
-                                       {
-                                       "name": "y4.txt",
-                                       "mime_type": "text/plain",
-                                       "size": 96,
-                                       "checksum": "e873loihagkjhsdo8y98wqyeshdlkahs"
-                                       }
-                                       ]
-                             }
-                            ],
-                 "files": [
-                           {
-                           "name": "y5.txt",
-                           "mime_type": "text/plain",
-                           "size": 95,
-                           "checksum": "f873loihagkjhsdo8y98wqyeshdlkahs"
-                           },
-                           {
-                           "name": "y6.txt",
-                           "mime_type": "text/plain",
-                           "size": 94,
-                           "checksum": "g873loihagkjhsdo8y98wqyeshdlkahs"
-                           }
-                           ]
-                 }
-                ]
-    }
 
 breadcrumbs = """
       <ol class="breadcrumb">
@@ -491,121 +253,148 @@ breadcrumb_list = """
 
       </ol>"""
 
-mind = {
-    "files": [],
-    "folders": [
-        {
-            "files": [
-                {
-                    "checksum": "17748a55c79f5fd63906a3b72fdb33db",
-                    "mime_type": [
-                        "text",
-                        "plain"
-                    ],
-                    "name": "y0.txt",
-                    "size": 24
-                },
-                {
-                    "checksum": "6fe05d420e64dfde21fb80e021012725",
-                    "mime_type": [
-                        "text",
-                        "plain"
-                    ],
-                    "name": "y1.txt",
-                    "size": 48
-                },
-                {
-                    "checksum": "f2c84ca801223da9af918e673231a170",
-                    "mime_type": [
-                        "text",
-                        "plain"
-                    ],
-                    "name": "y2.txt",
-                    "size": 72
-                }
-            ],
-            "folders": [
-                {
-                    "files": [],
-                    "folders": [],
-                    "name": "y1_2",
-                    "root": "/home/harlanaubuchon/z/x/y1"
-                }
-            ],
-            "name": "y1",
-            "root": "/home/harlanaubuchon/z/x"
-        },
-        {
-            "files": [
-                {
-                    "checksum": "ec0cbaa49d8ea0411ecf406385789c08",
-                    "mime_type": [
-                        "text",
-                        "plain"
-                    ],
-                    "name": "y6.txt",
-                    "size": 162
-                },
-                {
-                    "checksum": "d9857ed821a1ae0006dcb0e06f406759",
-                    "mime_type": [
-                        "text",
-                        "plain"
-                    ],
-                    "name": "y5.txt",
-                    "size": 139
-                }
-            ],
-            "folders": [
-                {
-                    "files": [
-                        {
-                            "checksum": "da6131d255860149f51a5730b7f69d0a",
-                            "mime_type": [
-                                "text",
-                                "plain"
-                            ],
-                            "name": "y3.txt",
-                            "size": 93
-                        },
-                        {
-                            "checksum": "ad4f5dd9e86d927d55a3dc037fbf91cf",
-                            "mime_type": [
-                                "text",
-                                "plain"
-                            ],
-                            "name": "y4.txt",
-                            "size": 116
-                        }
-                    ],
-                    "folders": [],
-                    "name": "y2_1",
-                    "root": "/home/harlanaubuchon/z/x/y2"
-                }
-            ],
-            "name": "y2",
-            "root": "/home/harlanaubuchon/z/x"
-        }
-    ],
-    "name": "x",
-    "root": "/home/harlanaubuchon/z"
-}
-
-
-form_mind_ext_section = """
-<div class="form-group">
-    <label for="checkboxes" class="col-md-4 control-label">${mime_section}</label>
-    <div class="col-md-4">
-
-        ${form_mind_file_ext}
-
+form_alert = """
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <h4>
+        I'm terribly sorry, I can't do that for you...
+    </h4>
+    <strong>Error</strong> - Please ensure all fields are filled correctly and try again.
 </div>
 """
 
-form_mind_file_ext = """
-		  <div class="checkbox">
-			<label for="checkboxes-0">
-			  <input type="checkbox" name="checkboxes" id="${file_ext}" value="1">
-			  ${file_ext}
-			</label>
-		  </div>"""
+minds_panel = """
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                 <a class="panel-title" data-toggle="collapse" data-parent="#panel-minds" href="#panel-element-Name_of_mind">${section}@/home/user/directory</a>
+
+                            </div>
+                            <div id="panel-element-Name_of_mind" class="panel-collapse collapse">
+                                <div class="panel-body">
+
+                                    <form class="form-horizontal" method="POST" id="System">
+                                        <fieldset>
+                                            <div class="form-group">
+                                                <label for="text" class="col-sm-4 control-label">Destination</label>
+                                                <div class="col-sm-6 input-group">
+
+                                                    <input type="text" class="form-control" id="text" name="destination" value="/home/user/directory/directory">
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="text" class="col-sm-4 control-label">File extensions</label>
+                                                <div class="col-sm-6 input-group">
+                                                    <input type="text" class="form-control" id="text" name="file_extensions" value=".txt, .pdf, .doc">
+                                                    <span class="help-block">Comma seperated list of file extensions (e.g., .jpg, .png)</span>
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-6 input-group">
+                                                     <button class="btn btn-primary" type="submit" name="section" value="${section}">Update</button>
+                                                    <button class="btn btn-danger btn-xs" type="submit" value="delete">Forget</button>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+"""
+
+new_minds_panel = ""
+remotes = """
+       <div class="container theme-showcase" role="main">
+            <div class="row clearfix">
+
+                <div class="col-md-12 column">
+                    <div class="panel-group" id="panel-minds">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                 <a class="panel-title" data-toggle="collapse" data-parent="#panel-minds" href="#panel-element-new_mind">New Mind</a>
+                            </div>
+                            <div id="panel-element-new_mind" class="panel-collapse collapse">
+                                <div class="panel-body">
+
+
+                                    <form class="form-horizontal" method="POST" id="form">
+                                        <fieldset>
+                                            <div class="row clearfix">
+                                                <div class="col-md-6 column">
+                                                    <div class="row clearfix">
+                                                        <h4>
+                                                            Step 1: &nbsp;&nbsp;Choose a folder for Minder to mind below.
+                                                        </h4>
+                                                        <div class="form-group">
+                                                            <label for="text" class="col-sm-2 control-label">Origin</label>
+                                                            <div class="col-sm-8 input-group">
+                                                                <input type="text" class="form-control" id="text" name="origin" value="">
+                                                            </div>
+                                                        </div>
+
+                                                        ${folders_template}
+
+                                                    </div>
+                                                    <div class="row clearfix">
+                                                        <h4>
+                                                        Step 2: &nbsp;&nbsp;Choose a folder for Minder to move your files to.
+                                                        </h4>
+                                                        <div class="form-group">
+                                                            <label for="text" class="col-sm-2 control-label">Destination</label>
+                                                            <div class="col-sm-8 input-group">
+                                                                <input type="text" class="form-control" id="text" name="destination" value="">
+                                                            </div>
+                                                        </div>
+
+                                                        ${folders_template}
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 column">
+                                                    <h4>
+                                                    Step 3: &nbsp;&nbsp;Choose a Name for your new Mind.
+                                                    </h4>
+                                                    <form class="form-horizontal" role="form">
+                                                        <div class="form-group">
+                                                            <label for="text" class="col-sm-4 control-label">Name of Mind</label>
+                                                            <div class="col-sm-6 input-group">
+                                                                <input type="text" class="form-control" id="text" name="name_of_mind" value="">
+                                                                <span class="help-block">Name containing no spaces and no special characters</span>
+                                                            </div>
+                                                        </div>
+                                                        <h4>
+                                                            Step 4: &nbsp;&nbsp;Enter one or more files extensions to Mind.
+                                                        </h4>
+                                                        <div class="form-group">
+                                                            <label for="text" class="col-sm-4 control-label">File Extensions</label>
+                                                            <div class="col-sm-6 input-group">
+                                                                <input type="text" class="form-control" id="text" name="file_extensions" value="">
+                                                                <span class="help-block">Comma seperated list of file extensions (e.g., .jpg, .png)</span>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-md-8">
+                                                                <button class="btn btn-primary" type="submit" name="section" value="new_mind">Save</button>
+                                                                <button class="btn btn-danger" type="reset" name="section" value="reset">Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${panels}
+
+                    </div>
+                </div>
+            </div>
+        </div><!-- container -->
+        """

@@ -84,7 +84,7 @@ def read_minder_settings(as_json=False):
         json_dict['sections'].append(config_items)
 
     if as_json is True:
-        je = json.JSONEncoder(indent=4, sort_keys=True, encoding="utf-8")
+        je = json.JSONEncoder(indent=4, sort_keys=True)
         json_config = je.encode(json_dict)
 
     else:
@@ -105,7 +105,7 @@ def _read_minder_config():
 
     else:
         raise OSError
-    print "_read_minder_config - hidden_files %s" % parser.get('Settings', 'show_hidden_files_boolean')
+
     return M_CONFIG
 
 

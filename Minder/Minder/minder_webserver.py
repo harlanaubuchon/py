@@ -24,15 +24,14 @@ methods_list = {
     'remotes': 'md.remotes'
 }
 print 'Setting Web root directory - %s' % WEBROOT
+
+
 #TODO Maybe put some of these methods in the WebServer so we can access self.path?
-
-
 def get_template(path_name=None, params=None):
     """Parameters: [title (String), navbar_active[key], breadcrumbs
     main_container(content)]"""
     #print 'get_template on %s' % path_name
     hidden_files = eval(mc.minderconfig()['Settings']['show_hidden_files_boolean'])
-    print 'get_template hidden_file is %s' % repr(hidden_files)
     sd = {}
     p = path_name.split('.')[0].strip('/')
     #print 'Template path - %s  parameters - %s' %(p, params)

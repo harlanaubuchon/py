@@ -67,7 +67,7 @@ def _file_obj(path, hidden_files):
     file_size = int(os.path.getsize(path))
 
     checksum = None
-    print 'interrogate hidden_files is %s' % hidden_files
+
     #TODO This if statement is misplaced check recent local merges
     if hidden_files is True:
         if file_size < size_limit:

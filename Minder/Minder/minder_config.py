@@ -36,7 +36,6 @@ def minderconfig(minder_config=None, update=False):
 
         else:
             _read_minder_config()
-            print 'Reading Minder Config'
 
     except OSError:
         if os.path.isdir(MINDER_HOME) is False:
@@ -123,7 +122,6 @@ def _write_minder_config(minder_config):
 
         with open(M_PATH, 'w') as file_handle:
             parser.write(file_handle)
-            print 'Writing Minder Config'
 
     except:
         raise

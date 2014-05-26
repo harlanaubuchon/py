@@ -38,19 +38,18 @@ def get_template(path_name=None, params=None):
     sd['title'] = p
     sd['navbar_active'] = md.navbar_active[p]
 
-    if params is not None and p == 'mind':
+    if params is not None and p == 'xxxx':
         pm = params.split('=')[1]
         minds_dict = minds.interrogate(pm, hidden_files)
         sd['main_container'] = mit.substitute(iter_folders(minds_dict))
         sd['breadcrumbs'] = breadcrumber(minds_dict)
 
-    elif params is None and p == 'mind':
+    elif params is None and p == 'xxxx':
         minds_dict = minds.interrogate(mc.USER_DIRECTORY, hidden_files)
         sd['main_container'] = mit.substitute(iter_folders(minds_dict))
         sd['breadcrumbs'] = breadcrumber(minds_dict)
 
     else:
-        print "EMPTY METHOD CALL - %s" % p
         sd['main_container'] = eval(methods_list[p])
         sd['breadcrumbs'] = breadcrumber({'root': '', 'name': p})
 
@@ -61,14 +60,11 @@ def get_template(path_name=None, params=None):
 
 
 def expand_sections(url_path, sections_dict=None):
-    """
-    :param url_path: str(Web page path)
-    :param sections_dict: dict(Minder "sections" dictionary)
-    :rtype : str -> html main container
-    """
+
+    panel_template = None
     config_uom = md.CONFIG_UOM
     if url_path == 'minds':
-        sections_dict = mc.read_minder_settings(md.minds_section_dict)
+        sections_dict = mc.read_minder_settings(minds.recollect())
         panel_template = md.minds_panel_group
 
     if url_path == 'settings':
@@ -149,6 +145,7 @@ def iter_folders(d, final_html=None):
         final_html.append(eft.substitute(fd))
 
     result = ''.join(final_html)
+
     return {"folders_template": result}
 
 
@@ -242,33 +239,45 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
     def do_POST(self):
-        url_path = urllib.unquote(self.path)
-        content_length = int(self.headers.getheader('content-length'))
-        post_body = self.rfile.read(content_length)
-        #print post_body
-        post_params = post_body.split('&')
-        param_dict = {}
 
-        for i in post_params:
-            parsed_i = urllib.unquote(i)
-            parsed_i = parsed_i.replace('+', ' ')
-            param_dict[parsed_i.split('=')[0]] = parsed_i.split('=')[1]
-        print url_path, param_dict
+        try:
+            url_path = urllib.unquote(self.path)
+            content_length = int(self.headers.getheader('content-length'))
+            post_body = self.rfile.read(content_length)
+            post_params = post_body.split('&')
+            param_dict = {}
+            p_section = None
 
-        if url_path == '/settings.html':
-            section = {param_dict.pop('section'): param_dict}
-            mc.minderconfig(section, update=True)
-            time.sleep(1)
-            h = get_template(url_path.strip('/'))
-            self.send_response(200)
-            self.send_header("Content-type", "text/html")
-            self.end_headers()
-            self.wfile.write(h)
 
-        else:
-            self.send_response(404)
-            self.send_header("Content-type", 0)
-            self.end_headers()
+            for i in post_params:
+                parsed_i = urllib.unquote(i)
+                parsed_i = parsed_i.replace('+', ' ')
+                param_dict[parsed_i.split('=')[0]] = parsed_i.split('=')[1]
+
+            p_section = {param_dict.pop('section'): param_dict}
+
+            if url_path == '/minds.html':
+                minds.recollect(p_section)
+                #time.sleep(1)
+                m = get_template(url_path.strip('/'))
+                self.send_response(200)
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.wfile.write(m)
+
+            if url_path == '/settings.html':
+                mc.minderconfig(p_section, update=True)
+                #time.sleep(1)
+                h = get_template(url_path.strip('/'))
+                self.send_response(200)
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.wfile.write(h)
+
+            print url_path, param_dict
+
+        except:
+            raise
 
 
 if __name__ == '__main__':

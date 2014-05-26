@@ -14,6 +14,8 @@ from urllib import quote
 
 MIND_DIR = '.mind'
 MIND = 'mind_palace.json'
+MINDS = 'minds.json'
+MINDS_FILE = os.path.join(mc.MINDER_HOME, MINDS)
 MIND_FILE = os.path.join(MIND_DIR, MIND)
 USER_DIR = os.path.expanduser('~')
 M_CONFIG = mc.minderconfig()
@@ -58,10 +60,33 @@ def mind(mind_path, refresh=False):
     return mind_palace
 
 
-def recollect(mind_path):
-    if mind_path is None:
-        mind_path = mc.MINDER_HOME
+def recollect(minds_dict=None):
+    minds_section_dict = None
+    minds_json = None
+    if os.path.isfile(MINDS_FILE):
+        minds_section_dict = _read_mind_palace(MINDS_FILE)
+    else:
+        minds_section_dict = {}
 
+    if isinstance(minds_dict, dict):
+
+        if minds_dict.has_key('new_mind'):
+            new_mind = minds_dict['new_mind']
+            minds_name = '%s@%s' % (new_mind['name_of_mind'], new_mind['origin'])
+            minds_section_dict[minds_name] = {
+                "destination": new_mind['destination'],
+                "file_extensions_list": new_mind['file_extensions_list']
+                }
+
+        else:
+            minds_section_dict[minds_dict.keys()[0]] = minds_dict.values()[0]
+
+        minds_json = _write_mind_palace(MINDS_FILE, minds_section_dict)
+
+    else:
+        minds_json = minds_section_dict
+
+    return minds_json
 
 
 def _file_obj(path, deep=None):
@@ -165,24 +190,28 @@ def interrogate(mind_path, hidden_files, deep=None, mind_dir=None):
     return mind_dir
 
 
-def _write_mind_palace(mind_path, mind_palace, mind_name=None):
+def _write_mind_palace(mind_path, mind_palace):
     je = json.JSONEncoder(indent=4, sort_keys=True)
-    if mind_name is None:
-        mind_name = MIND_FILE
-    file_path = os.path.join(mind_path, mind_name)
-    with open(file_path, 'w') as write_handle:
-        json_dir = je.encode(mind_palace)
-        write_handle.write(json_dir)
+
+    try:
+        with open(mind_path, 'w') as write_handle:
+            json_dir = je.encode(mind_palace)
+            write_handle.write(json_dir)
+    except:
+        raise
+
+    return mind_palace
 
 
-def _read_mind_palace(mind_path, mind_name=None):
+def _read_mind_palace(mind_path):
     jd = json.JSONDecoder()
-    if mind_name is None:
-        mind_name = MIND_FILE
-    file_path = os.path.join(mind_path, mind_name)
-    with open(file_path) as read_handle:
-        json_string = read_handle.read()
-        json_dir = jd.decode(json_string)
+
+    try:
+        with open(mind_path) as read_handle:
+            json_string = read_handle.read()
+            json_dir = jd.decode(json_string)
+    except:
+        raise
 
     return json_dir
 

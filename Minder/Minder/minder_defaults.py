@@ -8,7 +8,6 @@ DEFAULT_CONFIG = {
                               "file_size_limit_kilobytes": 300000,
                               "show_hidden_files_boolean": False,
                               },
-                 "Minds": {},
                  "System": {
                             "ignored_directories_list": 'AppData, Application Data, Cookies, Local Settings',
                             }
@@ -129,45 +128,45 @@ panel_group = """
 
 
 settings = """
-<div class="panel panel-default">
-    <div class="panel-heading">
-         <a class="panel-title" data-toggle="collapse" data-parent="#panel-${title}" href="#panel-element-${panel_id}">${section}</a>
-    </div>
-    <div id="panel-element-${panel_id}" class="panel-collapse collapse">
-        <div class="panel-body">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                         <a class="panel-title" data-toggle="collapse" data-parent="#panel-${title}" href="#panel-element-${panel_id}">${section}</a>
+                    </div>
+                    <div id="panel-element-${panel_id}" class="panel-collapse collapse">
+                        <div class="panel-body">
 
 
-            <form class="form-horizontal" method="POST" id="${section}">
-             <fieldset>
+                            <form class="form-horizontal" method="POST" id="${section}" name="${section}">
+                             <fieldset>
 
-                ${form_groups}
+                                ${form_groups}
 
-                <div class="form-group">
-                    <div class="col-sm-6 input-group">
-                         <button class="btn btn-primary" type="submit" name="section" value="${section}">Save</button>
+                                <div class="form-group">
+                                    <div class="col-sm-6 input-group">
+                                         <button class="btn btn-primary" type="submit" name="section" value="${section}">Save</button>
+                                    </div>
+                                </div>
+                             </fieldset>
+                            </form>
+
+
+                        </div>
                     </div>
                 </div>
-             </fieldset>
-            </form>
-
-
-        </div>
-    </div>
-</div>
 """
 
 
 # Expects dictionary with array of values (section, key, type as [text, number], value)
 
 form_group = """
-<div class="form-group">
-    <label for="${type}" class="col-sm-4 control-label">${label}</label>
-    <div class="col-sm-6 input-group">
+                                <div class="form-group">
+                                    <label for="${type}" class="col-sm-4 control-label">${label}</label>
+                                    <div class="col-sm-6 input-group">
 
-        ${form_items}
+                                        ${form_items}
 
-    </div>
-</div>
+                                    </div>
+                                </div>
 """
 
 form_item = {"select": """<select class="form-control" type="${type}" id="${type}" name="${key}" value="${value}">${select_options}</select>""",
@@ -193,7 +192,7 @@ home = """
 """
 
 # Expects dictionary with array of values (section, key, type as [text, number], value)
-remotes_test = """
+remotes = """
 <div class="container theme-showcase" role="main">
 
 </div>
@@ -263,7 +262,7 @@ form_alert = """
 </div>
 """
 
-minds_panel = """
+minds_panel2 = """
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                  <a class="panel-title" data-toggle="collapse" data-parent="#panel-minds" href="#panel-element-Name_of_mind">${section}@/home/user/directory</a>
@@ -304,7 +303,8 @@ minds_panel = """
                         </div>
 """
 
-remotes = ""
+
+
 minds_panel_group = """
        <div class="container theme-showcase" role="main">
             <div class="row clearfix">
@@ -371,7 +371,7 @@ minds_panel_group = """
                                                         <div class="form-group">
                                                             <label for="text" class="col-sm-4 control-label">File Extensions</label>
                                                             <div class="col-sm-6 input-group">
-                                                                <input type="text" class="form-control" id="text" name="file_extensions" value="">
+                                                                <input type="text" class="form-control" id="text" name="file_extensions_list" value="">
                                                                 <span class="help-block">Comma seperated list of file extensions (e.g., .jpg, .png)</span>
 
                                                             </div>
@@ -399,13 +399,3 @@ minds_panel_group = """
         </div><!-- container -->
         """
 
-minds_section_dict = {
-    'Name of Another Mind@/home/nyk/My Documents': {
-        'destination': '/home/User/My Documents/PDF',
-        'file_extensions': '.txt, .pdf, .doc, .docx'
-    },
-    'Name_of_Another_Mind@/home/nyk/Downloads': {
-        'destination': '/home/User/Directory/TXT',
-        'file_extensions': '.txt, .pdf, .doc, .docx'
-    }
-}

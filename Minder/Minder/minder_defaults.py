@@ -82,11 +82,27 @@ main_template = """<!DOCTYPE html>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+
+"""
+
+script_html = """
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+          $(document).ready(function()
+            {
+              $('a').click(function()
+                {
+              $('#originfolder').load('remotes.html #content');
+                });
+            });
+
+	</script>
   </body>
 </html>
 """
+
 # Provide key
 navbar_active = {"minds": """
             <li><a href="home.html">Home</a></li>
@@ -238,6 +254,12 @@ minds = """
 </div> <!-- /container -->
     """
 
+bare_mind = """
+    <ol class="tree">
+        ${folders_template}
+    </ol>
+   """
+
 begin_folders_template = """
         <li class="tree">
             <label for="${name}"><a href="remotes?root=${url}">${name}</a></label><input type="checkbox" id="${name}"/>
@@ -363,7 +385,8 @@ minds_panel_group = """
                                                             </div>
                                                         </div>
 
-                                                        #origin_folders_template
+                                                        <p><a href="#?root=/home/nyk">Click here to browse for a folder.</a></p>
+                                                        <div id="originfolder"></div>
 
                                                     </div>
                                                     <div class="row clearfix">
@@ -377,7 +400,8 @@ minds_panel_group = """
                                                             </div>
                                                         </div>
 
-                                                        #destination_folders_template
+                                                        <p><a href="#?root=/home/nyk">Click here to browse for a folder</a></p>
+                                                        <div id="destinationfolder"></div>
 
                                                     </div>
                                                 </div>

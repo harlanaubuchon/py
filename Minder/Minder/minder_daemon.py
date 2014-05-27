@@ -15,7 +15,7 @@ WAIT_TIME = eval(mc.minderconfig()['Settings']['mind_time_minutes'])
 LOG_HOME = os.path.join(mc.MINDER_HOME, 'logs')
 M_CONFIG = mc.minderconfig()
 
-#TODO Add a file size check and zip/tar.gz archiver
+#TODO Add a file size check and zip/tar.gz archiver for logfiles
 if os.path.isdir(LOG_HOME):
     os.chdir(LOG_HOME)
 else:
@@ -96,7 +96,7 @@ def daemon_runner():
     while True:
         time.sleep(WAIT_TIME * 60)
         runner_time = datetime.fromtimestamp(time.time()).isoformat()[:23] + 'Z'
-        log_start = '%s-MINDER DAEMON - Runner waking up deamon' % runner_time
+        log_start = '%s-MINDER DAEMON - Runner waking up daemon' % runner_time
         logging.info(log_start)
         mind_daemon()
 

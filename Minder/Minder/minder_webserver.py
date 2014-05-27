@@ -22,13 +22,9 @@ methods_list = {
     'home': 'md.home',
     'index': 'md.home',
     'settings': "expand_sections('settings')",
-    'minds': "expand_sections('minds')",  # 'mit.substitute(iter_folders(minds.interrogate(mc.USER_DIRECTORY)))',
+    'minds': "expand_sections('minds')",
     'remotes': 'mit.substitute(iter_folders(minds.interrogate(mc.USER_DIRECTORY)))'
 }
-print 'Setting Web root directory - %s' % WEBROOT
-m_daemon = [sys.executable, os.path.join(CUR_DIR, 'minder_daemon.py')]
-subprocess.Popen(m_daemon, shell=True)
-print 'Firing up the MINDER DAEMON...'
 
 
 #TODO Maybe put some of these methods in the WebServer so we can access self.path?
@@ -219,6 +215,7 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
         try:
             if url_path.endswith('.html'):
                 h = get_template(url_path.strip('/'))
+                h += md.script_html
                 self.send_response(200)
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
@@ -227,6 +224,7 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
             elif len(url_path.split('?')) > 1:
                 g = url_path.split('?')
                 h = get_template(g[0], g[1])
+                h += md.script_html
                 self.send_response(200)
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
@@ -273,6 +271,7 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
                 minds.recollect(p_section)
                 #time.sleep(1)
                 m = get_template(url_path.strip('/'))
+                m += md.script_html
                 self.send_response(200)
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
@@ -282,6 +281,7 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
                 mc.minderconfig(p_section, update=True)
                 #time.sleep(1)
                 h = get_template(url_path.strip('/'))
+                h += md.script_html
                 self.send_response(200)
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
@@ -295,10 +295,30 @@ if __name__ == '__main__':
     server_class = BaseHTTPServer.HTTPServer
     httpd = server_class((HOST_NAME, PORT_NUMBER), MinderWebApp)
     print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
+    print 'Setting Web root directory - %s' % WEBROOT
+
     webbrowser.open("http://localhost:8051/home.html", new=0)
+    d_pid = None
     try:
+        m_daemon = [sys.executable, os.path.join(CUR_DIR, 'minder_daemon.py')]
+        if mc.SYSTEM.startswith('win'):
+            d_pid = subprocess.Popen(m_daemon, shell=True)
+        else:
+            d_pid = subprocess.Popen(m_daemon)
+
+        print 'Firing up the MINDER DAEMON...'
+
         httpd.serve_forever()
     except KeyboardInterrupt:
-        pass
+        time.sleep(1)
+        print 'Are you sure you want to close Minder? y/n'
+        answer =''
+        while (answer != 'y') & (answer != 'n'):
+            answer = raw_input()
+            print answer
+        if answer == 'y':
+            d_pid.kill()
+            exit(0)
+
     httpd.server_close()
     print time.asctime(), "Server Stops - %s:%s" % (HOST_NAME, PORT_NUMBER)

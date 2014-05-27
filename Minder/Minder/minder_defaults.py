@@ -6,9 +6,10 @@ DEFAULT_CONFIG = {
                               "space_remaining_threshold_bytes": 2048,
                               "text_difference_threshold_percentage": 99,
                               "file_size_limit_kilobytes": 300000,
-                              "show_hidden_files_boolean": False,
+                              "mind_time_minutes": 1
                               },
                  "System": {
+                            "show_hidden_files_boolean": False,
                             "ignored_directories_list": 'AppData, Application Data, Cookies, Local Settings',
                             }
                  }
@@ -126,8 +127,36 @@ panel_group = """
 </div><!-- container -->
 """
 
+minds_panel = """
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                         <a class="panel-title" data-toggle="collapse" data-parent="#panel-${title}" href="#panel-element-${panel_id}">${section}</a>
+                    </div>
+                    <div id="panel-element-${panel_id}" class="panel-collapse collapse">
+                        <div class="panel-body">
 
-settings = """
+
+                            <form class="form-horizontal" method="POST" id="${section}" name="${section}">
+                             <fieldset>
+
+                                ${form_groups}
+
+                                <div class="form-group">
+                                    <div class="col-sm-6 input-group">
+                                        <button class="btn btn-primary" type="submit" name="section" value="${section}">Update</button>
+                                        <button class="btn btn-danger btn-xs" type="submit" name="delete" value="${section}">Forget</button>
+                                    </div>
+                                </div>
+                             </fieldset>
+                            </form>
+
+
+                        </div>
+                    </div>
+                </div>
+"""
+
+settings_panel = """
                 <div class="panel panel-default">
                     <div class="panel-heading">
                          <a class="panel-title" data-toggle="collapse" data-parent="#panel-${title}" href="#panel-element-${panel_id}">${section}</a>
@@ -201,8 +230,7 @@ remotes = """
 minds = """
 <div class="container theme-showcase" role="main">
 
-<legend>Minds</legend>
-<p>Choose a folder to Mind.</p>
+<legend>Remotes</legend>
     <ol class="tree">
         ${folders_template}
     </ol>
@@ -212,7 +240,7 @@ minds = """
 
 begin_folders_template = """
         <li class="tree">
-            <label for="${name}"><a href="minds?root=${url}">${name}</a></label><input type="checkbox" id="${name}"/>
+            <label for="${name}"><a href="remotes?root=${url}">${name}</a></label><input type="checkbox" id="${name}"/>
             <ol>
 """
 
@@ -234,7 +262,7 @@ breadcrumbs = """
 """
 
 breadcrumb_refs = """
-          <li><a href="/minds?root=${path}">${name}</a></li>
+          <li><a href="/remotes?root=${path}">${name}</a></li>
 """
 
 breadcrumb_active = """
@@ -244,9 +272,9 @@ breadcrumb_active = """
 breadcrumb_list = """
       <ol class="breadcrumb">
 
-          <li><a href="/minds?root=/home">home</a></li>
+          <li><a href="/remotes?root=/home">home</a></li>
 
-          <li><a href="/minds?root=/home/harlanaubuchon">harlanaubuchon</a></li>
+          <li><a href="/remotes?root=/home/harlanaubuchon">harlanaubuchon</a></li>
 
           <li class="active">x</li>
 

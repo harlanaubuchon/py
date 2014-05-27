@@ -3,12 +3,13 @@ import os
 import BaseHTTPServer
 import webbrowser
 import time
+import mimetypes
+import urllib
+import subprocess
 from string import Template
 import minder_config as mc
 import minder_defaults as md
 import minds
-import mimetypes
-import urllib
 
 
 HOST_NAME = ''
@@ -21,9 +22,12 @@ methods_list = {
     'index': 'md.home',
     'settings': "expand_sections('settings')",
     'minds': "expand_sections('minds')",  # 'mit.substitute(iter_folders(minds.interrogate(mc.USER_DIRECTORY)))',
-    'remotes': 'md.remotes'
+    'remotes': 'mit.substitute(iter_folders(minds.interrogate(mc.USER_DIRECTORY)))'
 }
 print 'Setting Web root directory - %s' % WEBROOT
+m_daemon = ['/usr/bin/python', os.path.join(CUR_DIR, 'minder_daemon.py')]
+subprocess.Popen(m_daemon)
+print 'Firing up the MINDER DAEMON...'
 
 
 #TODO Maybe put some of these methods in the WebServer so we can access self.path?
@@ -31,20 +35,20 @@ def get_template(path_name=None, params=None):
     """Parameters: [title (String), navbar_active[key], breadcrumbs
     main_container(content)]"""
     #print 'get_template on %s' % path_name
-    hidden_files = eval(mc.minderconfig()['Settings']['show_hidden_files_boolean'])
+    hidden_files = eval(mc.minderconfig()['System']['show_hidden_files_boolean'])
     sd = {}
     p = path_name.split('.')[0].strip('/')
     #print 'Template path - %s  parameters - %s' %(p, params)
     sd['title'] = p
     sd['navbar_active'] = md.navbar_active[p]
 
-    if params is not None and p == 'xxxx':
+    if params is not None and p == 'remotes':
         pm = params.split('=')[1]
         minds_dict = minds.interrogate(pm, hidden_files)
         sd['main_container'] = mit.substitute(iter_folders(minds_dict))
         sd['breadcrumbs'] = breadcrumber(minds_dict)
 
-    elif params is None and p == 'xxxx':
+    elif params is None and p == 'remotes':
         minds_dict = minds.interrogate(mc.USER_DIRECTORY, hidden_files)
         sd['main_container'] = mit.substitute(iter_folders(minds_dict))
         sd['breadcrumbs'] = breadcrumber(minds_dict)
@@ -61,21 +65,24 @@ def get_template(path_name=None, params=None):
 
 def expand_sections(url_path, sections_dict=None):
 
+    panel_group = None
     panel_template = None
     config_uom = md.CONFIG_UOM
     if url_path == 'minds':
         sections_dict = mc.read_minder_settings(minds.recollect())
-        panel_template = md.minds_panel_group
+        panel_group = md.minds_panel_group
+        panel_template = md.minds_panel
 
     if url_path == 'settings':
         sections_dict = mc.read_minder_settings(mc.minderconfig())
-        panel_template = md.panel_group
+        panel_group = md.panel_group
+        panel_template = md.settings_panel
 
     fo = Template(md.form_select_options)
     fi = Template(md.form_item['text'])
     ft = Template(md.form_group)
-    st = Template(md.settings)
-    pt = Template(panel_template)
+    st = Template(panel_template)
+    pt = Template(panel_group)
     final_html = ""
     section_html = ""
     panel_id = -1
@@ -248,13 +255,18 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
             param_dict = {}
             p_section = None
 
-
             for i in post_params:
                 parsed_i = urllib.unquote(i)
                 parsed_i = parsed_i.replace('+', ' ')
                 param_dict[parsed_i.split('=')[0]] = parsed_i.split('=')[1]
 
-            p_section = {param_dict.pop('section'): param_dict}
+            print url_path, param_dict
+
+            if param_dict.has_key('section'):
+                p_section = {param_dict.pop('section'): param_dict}
+
+            if param_dict.has_key('delete'):
+                p_section = {'delete': param_dict['delete']}
 
             if url_path == '/minds.html':
                 minds.recollect(p_section)
@@ -273,8 +285,6 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.wfile.write(h)
-
-            print url_path, param_dict
 
         except:
             raise

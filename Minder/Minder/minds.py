@@ -40,22 +40,23 @@ def mind(mind_path, refresh=False):
     refresh=True can be used to re-save the mind_palace.json file to the .mind 
     directory.
     """
-
+    hidden_files = eval(mc.minderconfig()['System']['show_hidden_files_boolean'])
     file_path = os.path.join(mind_path, MIND_FILE)
     mind_time = datetime.fromtimestamp(time.time()).isoformat()[:23] + 'Z'
-    mind_dir = {mind_path: {"minded_datetime": mind_time}}
+    minded_time = ["minded_datetime", mind_time]
+    deep = True
 
     if os.path.isfile(file_path):
         if refresh is True:
-            mind_palace = interrogate(mind_path, mind_dir)
-            _write_mind_palace(mind_path, mind_palace)
+            mind_palace = interrogate(mind_path, hidden_files, deep, minded_time)
+            _write_mind_palace(file_path, mind_palace)
         else:
-            mind_palace = _read_mind_palace(mind_path)
+            mind_palace = _read_mind_palace(file_path)
     else:
         if os.path.isdir(os.path.join(mind_path, MIND_DIR)) is False:
             os.makedirs(os.path.join(mind_path, MIND_DIR))
-        mind_palace = interrogate(mind_path, mind_dir)
-        _write_mind_palace(mind_path, mind_palace)
+        mind_palace = interrogate(mind_path, hidden_files, deep, minded_time)
+        _write_mind_palace(file_path, mind_palace)
 
     return mind_palace
 
@@ -69,6 +70,10 @@ def recollect(minds_dict=None):
         minds_section_dict = {}
 
     if isinstance(minds_dict, dict):
+        print 'minds.MINDS DICT - %s' % minds_dict
+        if minds_dict.has_key('delete'):
+            deleted_mind = minds_section_dict.pop(minds_dict['delete'])
+            print 'Delete Mind - %s' % deleted_mind
 
         if minds_dict.has_key('new_mind'):
             new_mind = minds_dict['new_mind']
@@ -78,7 +83,7 @@ def recollect(minds_dict=None):
                 "file_extensions_list": new_mind['file_extensions_list']
                 }
 
-        else:
+        if minds_dict.has_key('delete') is False and minds_dict.has_key('new_mind') is False:
             minds_section_dict[minds_dict.keys()[0]] = minds_dict.values()[0]
 
         minds_json = _write_mind_palace(MINDS_FILE, minds_section_dict)
@@ -89,19 +94,21 @@ def recollect(minds_dict=None):
     return minds_json
 
 
-def _file_obj(path, deep=None):
+def _file_obj(file_path, deep=None):
     if deep is None:
         deep = False
 
     size_limit = int(M_CONFIG['Settings']['file_size_limit_kilobytes'])
-    file_name = os.path.split(path)[-1]
-    file_size = int(os.path.getsize(path))
+    file_name = os.path.split(file_path)[-1]
+    file_size = int(os.path.getsize(file_path))
+    file_modified_time = os.path.getmtime(file_path)
+    modified_timestamp = datetime.fromtimestamp(file_modified_time).isoformat()[:23] + 'Z'
 
     checksum = None
 
     if deep is True:
         if file_size < size_limit:
-            with open(path) as file_handle:
+            with open(file_path) as file_handle:
                 file_data = file_handle.read()
                 checksum = hashlib.md5(file_data).hexdigest()
 
@@ -113,16 +120,17 @@ def _file_obj(path, deep=None):
         mime_type = ['None', 'Unknown']
 
     mind_file = {
-        "name": os.path.split(path)[-1],
+        "name": os.path.split(file_path)[-1],
         "mime_type": '/'.join(mime_type),
         "size": file_size,
-        "checksum": checksum
+        "checksum": checksum,
+        "modified_timestamp": modified_timestamp
     }
 
     return mind_file
 
 
-def interrogate(mind_path, hidden_files, deep=None, mind_dir=None):
+def interrogate(mind_path, hidden_files, deep=None, minded_time=None):
     """
     minds.interrogate(mind_path=File path, hidden_file=Look for '.name' files, deep=Perform md5 checksum)
     Creates a nested dictionary that represents the folder structure of mind_path
@@ -186,6 +194,9 @@ def interrogate(mind_path, hidden_files, deep=None, mind_dir=None):
         "files": file_dict_list,
         "folders": folder_dict_list
     }
+
+    if minded_time is not None:
+        mind_dir[minded_time[0]] = minded_time[1]
 
     return mind_dir
 

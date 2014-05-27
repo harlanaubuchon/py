@@ -1,5 +1,6 @@
 import time
 import os
+import sys
 import BaseHTTPServer
 import webbrowser
 import time
@@ -25,8 +26,8 @@ methods_list = {
     'remotes': 'mit.substitute(iter_folders(minds.interrogate(mc.USER_DIRECTORY)))'
 }
 print 'Setting Web root directory - %s' % WEBROOT
-m_daemon = ['/usr/bin/python', os.path.join(CUR_DIR, 'minder_daemon.py')]
-subprocess.Popen(m_daemon)
+m_daemon = [sys.executable, os.path.join(CUR_DIR, 'minder_daemon.py')]
+subprocess.Popen(m_daemon, shell=True)
 print 'Firing up the MINDER DAEMON...'
 
 

@@ -41,6 +41,7 @@ def mind(mind_path, refresh=False):
     directory.
     """
     hidden_files = eval(mc.minderconfig()['System']['show_hidden_files_boolean'])
+    dirs_depth = eval(mc.minderconfig()['System']['directory_listing_depth_number'])
     file_path = os.path.join(mind_path, MIND_FILE)
     mind_time = datetime.fromtimestamp(time.time()).isoformat()[:23] + 'Z'
     minded_time = ["minded_datetime", mind_time]
@@ -130,13 +131,15 @@ def _file_obj(file_path, deep=None):
     return mind_file
 
 
-def interrogate(mind_path, hidden_files, deep=None, minded_time=None):
+def interrogate(mind_path, hidden_files=None, deep=None, minded_time=None):
     """
     minds.interrogate(mind_path=File path, hidden_file=Look for '.name' files, deep=Perform md5 checksum)
     Creates a nested dictionary that represents the folder structure of mind_path
     """
+    #mind_path = qp['root']
+    print 'MIND PATH = %s' % mind_path
     if hidden_files is None:
-        hidden_files = False
+        hidden_files = eval(mc.minderconfig()['System']['show_hidden_files_boolean'])
     if deep is None:
         deep = False
     ignore_list = M_CONFIG['System']['ignored_directories_list']

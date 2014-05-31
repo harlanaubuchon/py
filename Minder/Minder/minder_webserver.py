@@ -1,14 +1,19 @@
-import time
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+__author__ = 'Harlan AuBuchon'
+
 import os
 import sys
 import BaseHTTPServer
 import webbrowser
-import time
 import mimetypes
 import urllib
 from urlparse import urlparse
 import subprocess
 from string import Template
+from datetime import datetime
+import time
+import logging
 import minder_config as mc
 import minder_defaults as md
 import minds
@@ -19,8 +24,12 @@ PORT_NUMBER = 8051
 CUR_DIR = os.getcwd()
 WEBROOT = os.path.join(CUR_DIR, 'webroot')
 M_CONFIG = mc.minderconfig()
+LOG_HOME = os.path.join(mc.MINDER_HOME, 'logs', 'minder.log')
+
+logging.basicConfig(filename=LOG_HOME, level=logging.DEBUG)
+mind_time = datetime.fromtimestamp(time.time()).isoformat()[:23] + 'Z'
 mit = Template(md.minds)
-mbt = Template(md.bare_mind)
+mbt = Template(md.folders)
 methods_list = {
     'home': 'md.home',
     'index': 'md.home',
@@ -31,124 +40,74 @@ methods_list = {
 }
 
 
-#TODO Maybe put some of these methods in the WebServer so we can access self.path?
-def get_template(path_name=None, params=None):
-    """Parameters: [title (String), navbar_active[key], breadcrumbs
-    main_container(content)]"""
-    #print 'get_template on %s' % path_name
-    hidden_files = eval(mc.minderconfig()['System']['show_hidden_files_boolean'])
-    sd = {}
-    p = path_name.split('.')[0].strip('/')
-
-    #ALL
-    if p != 'folders':
-        sd['title'] = p
-        sd['navbar_active'] = md.navbar_active[p]
-
-    if params is not None and p == 'remotes':
-        pm = params.split('=')[1]
-        minds_dict = minds.interrogate(pm, hidden_files)
-        sd['main_container'] = mit.substitute(iter_folders(minds_dict))
-        sd['breadcrumbs'] = breadcrumber(minds_dict)
-
-    elif params is None and p == 'remotes':
-        minds_dict = minds.interrogate(mc.USER_DIRECTORY, hidden_files)
-        sd['main_container'] = mit.substitute(iter_folders(minds_dict))
-        sd['breadcrumbs'] = breadcrumber(minds_dict)
-
-    else:
-        sd['main_container'] = eval(methods_list[p])
-        sd['breadcrumbs'] = breadcrumber({'root': '', 'name': p})
-
-    if p == 'folders':
-        html_string = sd['main_container']
-
-    else:
-        mt = Template(md.main_template)
-        html_string = mt.substitute(sd)
-
-    h_response = {
-        'code': 404,
-        'type': 0,
-        'body': None
-    }
-
-    return h_response
-
-
 def route_request(u):
-    qp = None
-    sd = None
     http_body = None
 
-    #try:
-    if u.query:
-        qp = {}
-        for q in u.query.split('&'):
-            q_pair = q.split('=')
-            qp[q_pair[0]] = q_pair[1]
+    try:
+        if u.query:
+            qp = {}
+            for q in u.query.split('&'):
+                q_pair = q.split('=')
+                qp[q_pair[0]] = q_pair[1]
 
-        minds_dict = minds.interrogate(qp)
-        breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
-        sd = {
-            'title': u.path,
-            'navbar_active': md.navbar_active[u.path],
-            'main_container': mit.substitute(iter_folders(minds_dict)),
-            'breadcrumbs': breadcrumber(breadcrumb_dict),
-        }
-
-    else:
-        qp = {'root': mc.USER_DIRECTORY}
-
-        if u.path == 'remotes':
-            minds_dict = minds.interrogate(mc.USER_DIRECTORY)
-            breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
-            sd = {
-                'title': u.path,
-                'navbar_active': md.navbar_active[u.path],
-                'main_container': mit.substitute(iter_folders(minds_dict)),
-                'breadcrumbs': breadcrumber(breadcrumb_dict),
-            }
-            http_body = sd['main_container']
-
-        if u.path == 'folders':
-            minds_dict = minds.interrogate(mc.USER_DIRECTORY)
-            breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
-            sd = {
-                'title': None,
-                'navbar_active': None,
-                'main_container': mbt.substitute(iter_folders(minds_dict)),
-                'breadcrumbs': breadcrumber(breadcrumb_dict),
-            }
-            http_body = sd['main_container']
+            if u.path == 'folders':
+                minds_dict = minds.interrogate(qp)
+                breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
+                sd = {
+                    'title': None,
+                    'navbar_active': None,
+                    'main_container': mbt.substitute(iter_folders(minds_dict)),
+                    'breadcrumbs': breadcrumber(breadcrumb_dict),
+                }
+                http_body = sd['main_container']
 
         else:
-            sd = {
-                'title': u.path,
-                'navbar_active': md.navbar_active[u.path],
-                'main_container': eval(methods_list[u.path]),
-                'breadcrumbs': breadcrumber({'root': '', 'name': u.path}),
-            }
-            mt = Template(md.main_template)
-            http_body = mt.substitute(sd)
+            if u.path == 'remotes':
+                minds_dict = minds.interrogate(mc.USER_DIRECTORY)
+                breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
+                sd = {
+                    'title': u.path,
+                    'navbar_active': md.navbar_active[u.path],
+                    'main_container': mit.substitute(iter_folders(minds_dict)),
+                    'breadcrumbs': breadcrumber(breadcrumb_dict),
+                }
+                http_body = sd['main_container']
 
-    h_response = {
-        'code': 200,
-        'type': 'text/html',
-        'body': http_body
-    }
+            if u.path == 'folders':
+                minds_dict = minds.interrogate(mc.USER_DIRECTORY)
+                breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
+                sd = {
+                    'title': None,
+                    'navbar_active': None,
+                    'main_container': mbt.substitute(iter_folders(minds_dict)),
+                    'breadcrumbs': breadcrumber(breadcrumb_dict),
+                }
+                http_body = sd['main_container']
 
-    #except:
-    #    h_response = {
-    #        'code': 404,
-    #        'type': 'text/html',
-    #        'body': md.html_404
-    #    }
+            else:
+                sd = {
+                    'title': u.path,
+                    'navbar_active': md.navbar_active[u.path],
+                    'main_container': eval(methods_list[u.path]),
+                    'breadcrumbs': breadcrumber({'root': '', 'name': u.path}),
+                }
+                mt = Template(md.main_template)
+                http_body = mt.substitute(sd)
+
+        h_response = {
+            'code': 200,
+            'type': 'text/html',
+            'body': http_body
+        }
+
+    except:
+        h_response = {
+            'code': 404,
+            'type': 'text/html',
+            'body': md.html_404
+        }
 
     return h_response
-
-
-
 
 
 def expand_sections(url_path, sections_dict=None):
@@ -177,13 +136,13 @@ def expand_sections(url_path, sections_dict=None):
     panel_id = -1
 
     for section in sections_dict['sections']:
-        panel_id = panel_id + 1
+        panel_id += 1
         form_builder = {
-                        "title": url_path,
-                        "section": section['name'],
-                        "form_groups": "",
-                        "panel_id": panel_id
-                        }
+            "title": url_path,
+            "section": section['name'],
+            "form_groups": "",
+            "panel_id": panel_id
+        }
 
         for i in section['items']:
             select_options = ""
@@ -193,9 +152,9 @@ def expand_sections(url_path, sections_dict=None):
             if i['type'] == 'select':
                 value_list = list(config_uom[key_type]['options'])
                 selected_value = {
-                                  "option": value_list.pop(value_list.index(i['value'])),
-                                  "selected": " selected"
-                                  }
+                    "option": value_list.pop(value_list.index(i['value'])),
+                    "selected": " selected"
+                }
                 select_options += fo.substitute(selected_value)
                 for option in value_list:
                     select_options += fo.substitute({'option': option, 'selected': ''})
@@ -281,23 +240,22 @@ def breadcrumber(t):
 
 
 def get_file(file_name):
-    f_response = None
     file_path = os.path.join(WEBROOT + file_name)
     if os.path.isfile(file_path):
         with open(file_path, "rb") as read_handle:
             http_body = read_handle.read()
             f_response = {
-                          'code': 200,
-                          'type': mimetypes.guess_type(file_name)[0],
-                          'body': http_body
-                          }
+                'code': 200,
+                'type': mimetypes.guess_type(file_name)[0],
+                'body': http_body
+            }
 
     else:
         f_response = {
-              'code': 404,
-              'type': 'text/html',
-              'body': md.html_404
-              }
+            'code': 404,
+            'type': 'text/html',
+            'body': md.html_404
+        }
 
     return f_response
 
@@ -309,26 +267,23 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
     Parameters: D = {'code': int(HTTP Status code), 'type': str(Mime Type), 'body': str(HTTP body)
     }
     """
-
     def do_HEAD(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
 
-
     def do_GET(self):
         raw_path = urllib.unquote(self.path)
         p = urlparse(raw_path)
 
-
         try:
             if p.path.strip('/') in md.WEB_PAGES:
                 u = p._replace(path=p.path.strip('/'))
-                h = route_request(u)
-                self.send_response(h['code'])
-                self.send_header("Content-type", h['type'])
+                w = route_request(u)
+                self.send_response(w['code'])
+                self.send_header("Content-type", w['type'])
                 self.end_headers()
-                self.wfile.write(h['body'])
+                self.wfile.write(w['body'])
 
             else:
                 f = get_file(p.path)
@@ -342,60 +297,49 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_header("Content-type", 0)
             self.end_headers()
 
-
     def do_POST(self):
         raw_path = urllib.unquote(self.path)
-        u = urlparse(raw_path)
+        p = urlparse(raw_path)
+        u = p._replace(path=p.path.strip('/'))
+        content_length = int(self.headers.getheader('content-length'))
+        post_body = self.rfile.read(content_length)
+        post_params = post_body.split('&')
+        param_dict = {}
+        p_section = None
 
-        try:
-            url_path = urllib.unquote(self.path)
-            content_length = int(self.headers.getheader('content-length'))
-            post_body = self.rfile.read(content_length)
-            print "!!! POST BODY - %s" % post_body
-            post_params = post_body.split('&')
-            param_dict = {}
-            p_section = None
+        for i in post_params:
+            parsed_i = urllib.unquote(i)
+            parsed_i = parsed_i.replace('+', ' ')
+            param_dict[parsed_i.split('=')[0]] = parsed_i.split('=')[1]
 
-            for i in post_params:
-                parsed_i = urllib.unquote(i)
-                parsed_i = parsed_i.replace('+', ' ')
-                param_dict[parsed_i.split('=')[0]] = parsed_i.split('=')[1]
+        if 'section' in param_dict:
+            p_section = {param_dict.pop('section'): param_dict}
 
-            print url_path, param_dict
+        if 'delete' in param_dict:
+            p_section = {'delete': param_dict['delete']}
 
-            if param_dict.has_key('section'):
-                p_section = {param_dict.pop('section'): param_dict}
+        if u.path == 'minds':
+            minds.recollect(p_section)
+            m = route_request(u)
+            self.send_response(m['code'])
+            self.send_header("Content-type", m['type'])
+            self.end_headers()
+            self.wfile.write(m['body'])
 
-            if param_dict.has_key('delete'):
-                p_section = {'delete': param_dict['delete']}
-
-            if url_path == '/minds.html':
-                minds.recollect(p_section)
-                #time.sleep(1)
-                m = get_template(url_path.strip('/'))
-                self.send_response(200)
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.wfile.write(m)
-
-            if url_path == '/settings.html':
-                mc.minderconfig(p_section, update=True)
-                #time.sleep(1)
-                h = get_template(url_path.strip('/'))
-                self.send_response(200)
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.wfile.write(h)
-
-        except:
-            raise
+        if u.path == 'settings':
+            mc.minderconfig(p_section, update=True)
+            s = route_request(u)
+            self.send_response(s['code'])
+            self.send_header("Content-type", s['type'])
+            self.end_headers()
+            self.wfile.write(s['body'])
 
 
 if __name__ == '__main__':
     server_class = BaseHTTPServer.HTTPServer
     httpd = server_class((HOST_NAME, PORT_NUMBER), MinderWebApp)
-    #print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
-    #print 'Setting Web root directory - %s' % WEBROOT
+    logging.info('%s-MINDER WEB    - Server Starts - %s:%s' % (mind_time, HOST_NAME, PORT_NUMBER))
+    logging.info('%s-MINDER WEB    - Setting Web root directory - %s' % (mind_time, WEBROOT))
 
     webbrowser.open("http://localhost:8051/home", new=0)
     d_pid = None
@@ -406,18 +350,19 @@ if __name__ == '__main__':
         else:
             d_pid = subprocess.Popen(m_daemon)
 
-        #print 'Firing up the MINDER DAEMON...'
+        logging.info('%s-MINDER WEB    - Firing up the MINDER DAEMON...' % mind_time)
 
         httpd.serve_forever()
+
     except KeyboardInterrupt:
-        print 'Are you sure you want to close Minder? y/n'
-        answer =''
+        print '\nAre you sure you want to exit Minder? y/n'
+        answer = ''
         while (answer != 'y') & (answer != 'n'):
             answer = raw_input()
-            #print answer
+
         if answer == 'y':
-            d_pid.kill()
+            d_pid.communicate()
             exit(0)
 
     httpd.server_close()
-    #print time.asctime(), "Server Stops - %s:%s" % (HOST_NAME, PORT_NUMBER)
+    logging.info('%s-MINDER WEB    - Server Stops - %s:%s' % (HOST_NAME, PORT_NUMBER))

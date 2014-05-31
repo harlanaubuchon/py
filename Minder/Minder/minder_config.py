@@ -1,15 +1,19 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__author__ = 'harlanaubuchon'
+__author__ = 'Harlan AuBuchon'
+## Change USER_DIRECTORY to '~' for *nix and M$ or
+## overwrite function with '/sdcard' for Android
+## Change SYSTEM to sys.platform for *nix and M$ or 'ANDROID' for Android
 
 import ConfigParser
 import os
 import json
 from sys import platform
+from datetime import datetime
+import time
+import logging
 import minder_defaults as md
 
-## Change USER_DIRECTORY to '~' for *nix and M$ or 
-## overwrite function with '/sdcard' for Android
-## Change SYSTEM to sys.platform for *nix and M$ or 'ANDROID' for Android
 
 CURRENT_DIRECTORY = os.getcwd()
 USER_DIRECTORY = os.path.expanduser('~')
@@ -19,6 +23,10 @@ MINDER_CONFIG_FILE = 'minder_config.ini'
 MINDER_HOME = os.path.join(USER_DIRECTORY, '.Minder')
 M_PATH = os.path.join(MINDER_HOME, MINDER_CONFIG_FILE)
 M_CONFIG = {}
+LOG_HOME = os.path.join(MINDER_HOME, 'logs', 'minder.log')
+
+logging.basicConfig(filename=LOG_HOME, level=logging.DEBUG)
+mind_time = datetime.fromtimestamp(time.time()).isoformat()[:23] + 'Z'
 
 
 def minderconfig(minder_config=None, update=False):
@@ -29,20 +37,20 @@ def minderconfig(minder_config=None, update=False):
     this case it writes a new 'Default' Config file.
     
     """
-
     try:
         if update is True and minder_config is not None:
             _write_minder_config(minder_config)
+            logging.info('%s-MINDER CONFIG - Updated mind config.' % mind_time)
 
         else:
             _read_minder_config()
 
     except OSError:
         if os.path.isdir(MINDER_HOME) is False:
-            print 'New Minder install...  Creating Minder Home.'
+            logging.info('%s-MINDER CONFIG New Minder install...  Creating Minder Home.' % mind_time)
             os.makedirs(MINDER_HOME)
         _write_minder_config(md.DEFAULT_CONFIG)
-        print 'Created Minder Home at %s' % M_PATH
+        logging.info('%s-MINDER CONFIG Created Minder Home at %s' % (M_PATH, mind_time))
 
     minder_config = _read_minder_config()
 
@@ -51,32 +59,36 @@ def minderconfig(minder_config=None, update=False):
 
 def read_minder_settings(m_config, as_json=False):
     config_uom = md.CONFIG_UOM
-    json_dict= {'sections': []}
+    json_dict = {'sections': []}
 
     for section in m_config:
         config_items = {
-                    "name": section,
-                    "items": [],
-                    }
+            "name": section,
+            "items": [],
+        }
+
         for k, v in m_config[section].iteritems():
             split_label = k.split('_')
             label = k.split('_')
+
             if split_label[-1] in config_uom:
-                config_item =  {
-                        "key": k,
-                        "value": str(v),
-                        "type": config_uom[split_label[-1]]['type'],
-                        "label": (' ').join(split_label[:-1]).capitalize(),
-                        "uom": config_uom[split_label[-1]]['uom']
-                        }
+                config_item = {
+                    "key": k,
+                    "value": str(v),
+                    "type": config_uom[split_label[-1]]['type'],
+                    "label": (' ').join(split_label[:-1]).capitalize(),
+                    "uom": config_uom[split_label[-1]]['uom']
+                }
+
             else:
-                 config_item =  {
-                        "key": k,
-                        "value": str(v),
-                        "type": config_uom['text']['type'],
-                        "label": (' ').join(label).capitalize(),
-                        "uom": config_uom['text']['uom']
-                        }
+                config_item = {
+                    "key": k,
+                    "value": str(v),
+                    "type": config_uom['text']['type'],
+                    "label": (' ').join(label).capitalize(),
+                    "uom": config_uom['text']['uom']
+                }
+
             config_items['items'].append(config_item)
 
         json_dict['sections'].append(config_items)
@@ -102,6 +114,7 @@ def _read_minder_config():
                 M_CONFIG[section][key] = value
 
     else:
+        logging.info('%s-MINDER CONFIG - Error reading mind config.' % mind_time)
         raise OSError
 
     return M_CONFIG
@@ -124,6 +137,7 @@ def _write_minder_config(minder_config):
             parser.write(file_handle)
 
     except:
+        logging.info('%s-MINDER CONFIG - Error writing mind config.' % mind_time)
         raise
 
 

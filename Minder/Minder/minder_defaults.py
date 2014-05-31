@@ -2,28 +2,28 @@
 __author__ = 'harlanaubuchon'
 
 DEFAULT_CONFIG = {
-                 "Settings": {
-                              "space_remaining_threshold_bytes": 2048,
-                              "text_difference_threshold_percentage": 99,
-                              "file_size_limit_kilobytes": 300000,
-                              "mind_time_minutes": 1
-                              },
-                 "System": {
-                            "show_hidden_files_boolean": False,
-                            "ignored_directories_list": 'AppData, Application Data, Cookies, Local Settings',
-                            "directory_listing_depth_number": 1
-                            }
-                 }
+    "Settings": {
+        "space_remaining_threshold_bytes": 2048,
+        "text_difference_threshold_percentage": 99,
+        "file_size_limit_kilobytes": 300000,
+        "mind_time_minutes": 1
+    },
+    "System": {
+        "show_hidden_files_boolean": False,
+        "ignored_directories_list": 'AppData, Application Data, Cookies, Local Settings',
+        "directory_listing_depth_number": 1
+    }
+}
 
 CONFIG_UOM = {
-            "percentage": {"uom": "%", "type": "number"},
-            "bytes": {"uom": "B", "type": "number"},
-            "kilobytes": {"uom": "KB", "type": "number"},
-            "boolean": {"uom": None, "type": "select", "options": ['True', 'False']},
-            "number": {"uom": None, "type": "number"},
-            "text": {"uom": None, "type": "text"},
-            "list": {"uom": None, "type": "text"},
-            }
+    "percentage": {"uom": "%", "type": "number"},
+    "bytes": {"uom": "B", "type": "number"},
+    "kilobytes": {"uom": "KB", "type": "number"},
+    "boolean": {"uom": None, "type": "select", "options": ['True', 'False']},
+    "number": {"uom": None, "type": "number"},
+    "text": {"uom": None, "type": "text"},
+    "list": {"uom": None, "type": "text"},
+}
 
 WEB_PAGES = ['minds', 'folders', 'remotes', 'settings', 'home', 'index']
 WEB_FILES = ['html', 'css', 'js', 'eot', 'svg', 'ttf', 'woff', 'png']
@@ -196,9 +196,6 @@ settings_panel = """
                 </div>
 """
 
-
-# Expects dictionary with array of values (section, key, type as [text, number], value)
-
 form_group = """
                                 <div class="form-group">
                                     <label for="${type}" class="col-sm-4 control-label">${label}</label>
@@ -218,8 +215,6 @@ form_item = {"select": """<select class="form-control" type="${type}" id="${type
 
 form_select_options = """<option value="${option}"${selected}>${option}</option>"""
 
-
-# Parameters: None
 home = """
 <div class="container">
   <div class="jumbotron">
@@ -230,13 +225,6 @@ home = """
     </p>
   </div>
 </div> <!-- /container -->
-"""
-
-# Expects dictionary with array of values (section, key, type as [text, number], value)
-remotes = """
-<div class="container theme-showcase" role="main">
-
-</div>
 """
 
 minds = """
@@ -250,7 +238,7 @@ minds = """
 </div> <!-- /container -->
     """
 
-bare_mind = """
+folders = """
     <ol class="tree" id="folders">
         ${folders_template}
     </ol>
@@ -258,7 +246,7 @@ bare_mind = """
 
 begin_folders_template = """
         <li class="tree">
-            <label for="${name}"><a href="remotes?root=${url}">${name}</a></label><input type="checkbox" id="${name}"/>
+            <label for="${name}"><a id="origin" href="folders?root=${url}">${name}</a></label><input type="checkbox" id="${name}"/>
             <ol>
 """
 
@@ -308,49 +296,6 @@ form_alert = """
 </div>
 """
 
-minds_panel2 = """
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                 <a class="panel-title" data-toggle="collapse" data-parent="#panel-minds" href="#panel-element-Name_of_mind">${section}@/home/user/directory</a>
-
-                            </div>
-                            <div id="panel-element-Name_of_mind" class="panel-collapse collapse">
-                                <div class="panel-body">
-
-                                    <form class="form-horizontal" method="POST" id="System">
-                                        <fieldset>
-                                            <div class="form-group">
-                                                <label for="text" class="col-sm-4 control-label">Destination</label>
-                                                <div class="col-sm-6 input-group">
-
-                                                    <input type="text" class="form-control" id="text" name="destination" value="/home/user/directory/directory">
-
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="text" class="col-sm-4 control-label">File extensions</label>
-                                                <div class="col-sm-6 input-group">
-                                                    <input type="text" class="form-control" id="text" name="file_extensions" value=".txt, .pdf, .doc">
-                                                    <span class="help-block">Comma seperated list of file extensions (e.g., .jpg, .png)</span>
-
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="col-sm-6 input-group">
-                                                     <button class="btn btn-primary" type="submit" name="section" value="${section}">Update</button>
-                                                    <button class="btn btn-danger btn-xs" type="submit" value="delete">Forget</button>
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                    </form>
-
-                                </div>
-                            </div>
-                        </div>
-"""
-
-
-
 minds_panel_group = """
        <div class="container theme-showcase" role="main">
             <div class="row clearfix">
@@ -375,13 +320,13 @@ minds_panel_group = """
                                                             Step 1: &nbsp;&nbsp;Choose a folder for Minder to mind below.
                                                         </h4>
                                                         <div class="form-group">
-                                                            <label for="text" class="col-sm-2 control-label">Origin</label>
+                                                            <label for="origintext" class="col-sm-2 control-label">Origin</label>
                                                             <div class="col-sm-8 input-group">
-                                                                <input type="text" class="form-control" id="text" name="origin" value="">
+                                                                <input type="text" class="form-control" id="origintext" name="origin" value="">
                                                             </div>
                                                         </div>
 
-                                                        <a id="test" href="folders">Click here to fetch HTML content.</a>
+                                                        <a id="origin" href="folders">Click here to browse folders.</a>
                                                         <div id="originfolder"></div>
 
                                                     </div>
@@ -396,7 +341,8 @@ minds_panel_group = """
                                                             </div>
                                                         </div>
 
-
+                                                        <a id="destination" href="folders">Click here to browse folders.</a>
+                                                        <div id="destinationfolder"></div>
 
                                                     </div>
                                                 </div>

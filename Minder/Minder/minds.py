@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__author__ = 'harlanaubuchon'
+__author__ = 'Harlan AuBuchon'
 
 import os
 from datetime import datetime
@@ -7,9 +8,9 @@ import time
 import hashlib
 import json
 import mimetypes
-from functools import reduce
 import minder_config as mc
 from urllib import quote
+import logging
 
 
 MIND_DIR = '.mind'
@@ -19,6 +20,10 @@ MINDS_FILE = os.path.join(mc.MINDER_HOME, MINDS)
 MIND_FILE = os.path.join(MIND_DIR, MIND)
 USER_DIR = os.path.expanduser('~')
 M_CONFIG = mc.minderconfig()
+LOG_HOME = os.path.join(mc.MINDER_HOME, 'logs', 'minder.log')
+
+logging.basicConfig(filename=LOG_HOME, level=logging.DEBUG)
+mind_time = datetime.fromtimestamp(time.time()).isoformat()[:23] + 'Z'
 
 
 def _init_mindtypes():
@@ -41,6 +46,7 @@ def mind(mind_path, refresh=False):
     directory.
     """
     hidden_files = eval(mc.minderconfig()['System']['show_hidden_files_boolean'])
+    # TODO Implement initial directory depth to save time when hidden files is True
     dirs_depth = eval(mc.minderconfig()['System']['directory_listing_depth_number'])
     file_path = os.path.join(mind_path, MIND_FILE)
     mind_time = datetime.fromtimestamp(time.time()).isoformat()[:23] + 'Z'
@@ -63,28 +69,26 @@ def mind(mind_path, refresh=False):
 
 
 def recollect(minds_dict=None):
-    minds_section_dict = None
-    minds_json = None
     if os.path.isfile(MINDS_FILE):
         minds_section_dict = _read_mind_palace(MINDS_FILE)
     else:
         minds_section_dict = {}
 
     if isinstance(minds_dict, dict):
-        print 'minds.MINDS DICT - %s' % minds_dict
-        if minds_dict.has_key('delete'):
-            deleted_mind = minds_section_dict.pop(minds_dict['delete'])
-            print 'Delete Mind - %s' % deleted_mind
 
-        if minds_dict.has_key('new_mind'):
+        if 'delete' in minds_dict:
+            deleted_mind = minds_section_dict.pop(minds_dict['delete'])
+            logging.info('Delete Mind - %s' % deleted_mind)
+
+        if 'new_mind' in minds_dict:
             new_mind = minds_dict['new_mind']
             minds_name = '%s@%s' % (new_mind['name_of_mind'], new_mind['origin'])
             minds_section_dict[minds_name] = {
                 "destination": new_mind['destination'],
                 "file_extensions_list": new_mind['file_extensions_list']
-                }
+            }
 
-        if minds_dict.has_key('delete') is False and minds_dict.has_key('new_mind') is False:
+        else:
             minds_section_dict[minds_dict.keys()[0]] = minds_dict.values()[0]
 
         minds_json = _write_mind_palace(MINDS_FILE, minds_section_dict)
@@ -136,16 +140,20 @@ def interrogate(mind_path, hidden_files=None, deep=None, minded_time=None):
     minds.interrogate(mind_path=File path, hidden_file=Look for '.name' files, deep=Perform md5 checksum)
     Creates a nested dictionary that represents the folder structure of mind_path
     """
-    #mind_path = qp['root']
-    print 'MIND PATH = %s' % mind_path
+    if isinstance(mind_path, dict):
+        mind_path = mind_path['root']
+
     if hidden_files is None:
         hidden_files = eval(mc.minderconfig()['System']['show_hidden_files_boolean'])
+
     if deep is None:
         deep = False
+
     ignore_list = M_CONFIG['System']['ignored_directories_list']
     folder_list = []
     file_list = []
-    # I know, let's wrap this thing in a ridiculous try/except block
+
+    # I know! Let's wrap this thing in a ridiculous try/except block
     # to deal with M$ Windows and all the moronic symlinked directories sprinkled
     # all over the "User" directory! Mr. Balmer, you owe me 5 hours for this crap.
     try:
@@ -167,14 +175,12 @@ def interrogate(mind_path, hidden_files=None, deep=None, minded_time=None):
 
                 if hidden_files is True:
                     folder_list.append(node)
-    
-          
+
     except:
         if mc.SYSTEM.startswith('win'):
-            print "Microsoft, in their infinite wisdom, has forbidden you from looking at %s" % mind_path
+            logging.info("%s-MINDER Microsoft, in their infinite wisdom, has forbidden you from looking at %s" % (mind_time, mind_path))
         else:
-            print "IOError - Check permissions for folders - %s" % mind_path
-
+            logging.info("%s-MINDER IOError - Check permissions for folders - %s" % (mind_time, mind_path))
 
     folder_list.sort()
     file_list.sort()

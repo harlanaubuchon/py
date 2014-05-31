@@ -25,7 +25,8 @@ M_PATH = os.path.join(MINDER_HOME, MINDER_CONFIG_FILE)
 M_CONFIG = {}
 LOG_HOME = os.path.join(MINDER_HOME, 'logs', 'minder.log')
 
-if os.path.isdir(os.path.join(MINDER_HOME, 'logs')) is False:
+if os.path.isdir(os.path.join(MINDER_HOME)) is False:
+    os.mkdir(os.path.join(MINDER_HOME))
     os.mkdir(os.path.join(MINDER_HOME, 'logs'))
 
 logging.basicConfig(filename=LOG_HOME, level=logging.DEBUG)

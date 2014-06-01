@@ -54,7 +54,7 @@ def mind_daemon():
 
                         if os.path.isfile(potential_file) is False:
                             shutil.move(target, dest_folder)
-                            logging.info('%s-MINDER DAEMON moved - %s to - %s' % (mind_time, target, dest_folder))
+                            logging.info('%s-MINDER DAEMON - Moved - %s to - %s' % (mind_time, target, dest_folder))
 
                         else:
                             with open(potential_file) as file_handle:
@@ -62,17 +62,17 @@ def mind_daemon():
                                 potential_md5 = hashlib.md5(file_data).hexdigest()
 
                             if potential_md5 == target_md5:
-                                logging.info('%s-MINDER DAEMON found identical file %s in %s' % (
+                                logging.info('%s-MINDER DAEMON - Found identical file %s in %s' % (
                                     mind_time, potential_file, dest_folder
                                 ))
                                 os.remove(target)
-                                logging.info('%s-MINDER DAEMON Deleted duplicate file %s' % (mind_time, target))
+                                logging.info('%s-MINDER DAEMON - Deleted duplicate file %s' % (mind_time, target))
 
                             else:
                                 file_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S-%f')
                                 rename_file = '%s_%s' % (file_timestamp, target_name)
                                 shutil.move(target, os.path.join(dest_folder, rename_file))
-                                logging.info('%s-MINDER DAEMON Renamed duplicate file name %s to %s' % (
+                                logging.info('%s-MINDER DAEMON - Renamed duplicate file name %s to %s' % (
                                     mind_time, target, rename_file
                                 ))
 

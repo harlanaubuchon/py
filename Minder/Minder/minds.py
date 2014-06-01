@@ -78,7 +78,7 @@ def recollect(minds_dict=None):
 
         if 'delete' in minds_dict:
             deleted_mind = minds_section_dict.pop(minds_dict['delete'])
-            logging.info('Delete Mind - %s' % deleted_mind)
+            logging.info('%s-MINDER        - Delete Mind - %s' % deleted_mind)
 
         if 'new_mind' in minds_dict:
             new_mind = minds_dict['new_mind']
@@ -178,9 +178,12 @@ def interrogate(mind_path, hidden_files=None, deep=None, minded_time=None):
 
     except:
         if mc.SYSTEM.startswith('win'):
-            logging.info("%s-MINDER Microsoft, in their infinite wisdom, has forbidden you from looking at %s" % (mind_time, mind_path))
+            logging.info(
+                "%s-MINDER        - Microsoft, in their infinite wisdom, has forbidden you from looking at %s"
+                % (mind_time, mind_path)
+            )
         else:
-            logging.info("%s-MINDER IOError - Check permissions for folders - %s" % (mind_time, mind_path))
+            logging.info("%s-MINDER        - IOError - Check permissions for folders - %s" % (mind_time, mind_path))
 
     folder_list.sort()
     file_list.sort()

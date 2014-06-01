@@ -69,12 +69,18 @@ def mind_daemon():
                                 logging.info('%s-MINDER DAEMON - Deleted duplicate file %s' % (mind_time, target))
 
                             else:
-                                file_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S-%f')
-                                rename_file = '%s_%s' % (file_timestamp, target_name)
-                                shutil.move(target, os.path.join(dest_folder, rename_file))
-                                logging.info('%s-MINDER DAEMON - Renamed duplicate file name %s to %s' % (
-                                    mind_time, target, rename_file
-                                ))
+                                #file_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S-%f')
+                                rename_file = '%s_%s' % (potential_md5, target_name)
+                                if os.path.isfile(os.path.join(dest_folder, rename_file)):
+                                    os.remove(target)
+                                    logging.info('%s-MINDER DAEMON - Duplicate file name %s found again. Deleting %s' % (
+                                        mind_time, rename_file, target
+                                    ))
+                                else:
+                                    shutil.move(target, os.path.join(dest_folder, rename_file))
+                                    logging.info('%s-MINDER DAEMON - Renamed duplicate file name %s to %s' % (
+                                        mind_time, target, rename_file
+                                    ))
 
                 except:
                     raise

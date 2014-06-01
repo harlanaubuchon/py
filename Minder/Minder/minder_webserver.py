@@ -42,70 +42,79 @@ methods_list = {
 
 def route_request(u):
     http_body = None
+    minds_dict = None
+    logging.info('route_request - path - %s query - %s' % (repr(u.path), repr(u.query)))
+##    try:
+    if len(u.query) > 0:
+        qp = None
+        for q in u.query.split('&'):
+            q_pair = q.split('=')
+            qp = {q_pair[0]: q_pair[1]}
 
-    try:
-        if u.query:
-            qp = {}
-            for q in u.query.split('&'):
-                q_pair = q.split('=')
-                qp[q_pair[0]] = q_pair[1]
+        if u.path == 'folders':
+            minds_dict = minds.interrogate(qp)
+            logging.info('folders qp - %s' % qp)
+            breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
+            sd = {
+                'title': None,
+                'navbar_active': None,
+                'main_container': mbt.substitute(iter_folders(minds_dict)),
+                'breadcrumbs': breadcrumber(breadcrumb_dict),
+            }
+            http_body = sd['breadcrumbs']
+            http_body += sd['main_container']
+            logging.info('BREADCRUMBER - Breadcrumb list - %s' % sd['breadcrumbs'])
 
-            if u.path == 'folders':
-                minds_dict = minds.interrogate(qp)
-                breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
-                sd = {
-                    'title': None,
-                    'navbar_active': None,
-                    'main_container': mbt.substitute(iter_folders(minds_dict)),
-                    'breadcrumbs': breadcrumber(breadcrumb_dict),
-                }
-                http_body = sd['main_container']
-
-        else:
-            if u.path == 'remotes':
-                minds_dict = minds.interrogate(mc.USER_DIRECTORY)
-                breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
-                sd = {
-                    'title': u.path,
-                    'navbar_active': md.navbar_active[u.path],
-                    'main_container': mit.substitute(iter_folders(minds_dict)),
-                    'breadcrumbs': breadcrumber(breadcrumb_dict),
-                }
-                http_body = sd['main_container']
-
-            if u.path == 'folders':
-                minds_dict = minds.interrogate(mc.USER_DIRECTORY)
-                breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
-                sd = {
-                    'title': None,
-                    'navbar_active': None,
-                    'main_container': mbt.substitute(iter_folders(minds_dict)),
-                    'breadcrumbs': breadcrumber(breadcrumb_dict),
-                }
-                http_body = sd['main_container']
-
-            else:
-                sd = {
-                    'title': u.path,
-                    'navbar_active': md.navbar_active[u.path],
-                    'main_container': eval(methods_list[u.path]),
-                    'breadcrumbs': breadcrumber({'root': '', 'name': u.path}),
-                }
-                mt = Template(md.main_template)
-                http_body = mt.substitute(sd)
-
-        h_response = {
-            'code': 200,
-            'type': 'text/html',
-            'body': http_body
+    #else:
+    if u.path == 'remotes':
+        minds_dict = minds.interrogate(mc.USER_DIRECTORY)
+        breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
+        sd = {
+            'title': u.path,
+            'navbar_active': md.navbar_active[u.path],
+            'main_container': mit.substitute(iter_folders(minds_dict)),
+            'breadcrumbs': breadcrumber(breadcrumb_dict),
         }
+        mt = Template(md.main_template)
+        http_body = mt.substitute(sd)
+        logging.info('REMOTES - Remotes path - %s' % u.path)
 
-    except:
-        h_response = {
-            'code': 404,
-            'type': 'text/html',
-            'body': md.html_404
+    if len(u.query) == 0 and u.path == 'folders':
+        minds_dict = minds.interrogate(mc.USER_DIRECTORY)
+        breadcrumb_dict = {'root': minds_dict['root'], 'name': minds_dict['name']}
+        sd = {
+            'title': None,
+            'navbar_active': None,
+            'main_container': mbt.substitute(iter_folders(minds_dict)),
+            'breadcrumbs': breadcrumber(breadcrumb_dict),
         }
+        http_body = sd['breadcrumbs']
+        http_body += sd['main_container']
+        logging.info('FOLDERS - No query path - %s' % u.path)
+
+    if u.path not in ['folders', 'remotes']:
+        sd = {
+            'title': u.path,
+            'navbar_active': md.navbar_active[u.path],
+            'main_container': eval(methods_list[u.path]),
+            'breadcrumbs': breadcrumber({'root': '', 'name': u.path}),
+        }
+        mt = Template(md.main_template)
+        http_body = mt.substitute(sd)
+        logging.info('NOT Folders/Remotes - path - %s' % u.path)
+
+    h_response = {
+        'code': 200,
+        'type': 'text/html',
+        'body': http_body
+    }
+
+##    except:
+##        h_response = {
+##            'code': 404,
+##            'type': 'text/html',
+##            'body': md.html_404
+##        }
 
     return h_response
 
@@ -215,6 +224,7 @@ def breadcrumber(t):
 
     for parts in root_path.split(os.path.sep):
         breadcrumb.append(parts)
+    logging.info('BREADCRUMBER - Breadcrumb list - %s' % breadcrumb)
 
     # TODO Check this on windows for regressions
     #if breadcrumb[0] == '':

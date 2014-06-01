@@ -97,19 +97,16 @@ main_template = """<!DOCTYPE html>
 navbar_active = {"minds": """
             <li><a href="home">Home</a></li>
             <li class="active"><a href="minds">.Minds</a></li>
-            <li><a href="remotes">Remotes</a></li>
             <li><a href="settings">Settings</a></li>
             """,
                  "folders": """
             <li><a href="home">Home</a></li>
             <li class="active"><a href="minds">.Minds</a></li>
-            <li><a href="remotes">Remotes</a></li>
             <li><a href="settings">Settings</a></li>
             """,
                  "settings": """
             <li><a href="home">Home</a></li>
             <li><a href="minds">.Minds</a></li>
-            <li><a href="remotes">Remotes</a></li>
             <li class="active"><a href="settings">Settings</a></li>
             """,
                  "remotes": """
@@ -121,7 +118,6 @@ navbar_active = {"minds": """
                  "home": """
             <li class="active"><a href="home">Home</a></li>
             <li><a href="minds">.Minds</a></li>
-            <li><a href="remotes">Remotes</a></li>
             <li><a href="settings">Settings</a></li>
             """}
 
@@ -268,7 +264,7 @@ breadcrumbs = """
 """
 
 breadcrumb_refs = """
-          <li><a href="/remotes?root=${path}">${name}</a></li>
+          <li><a id="origin" href="/folders?root=${path}">${name}</a></li>
 """
 
 breadcrumb_active = """
@@ -278,9 +274,9 @@ breadcrumb_active = """
 breadcrumb_list = """
       <ol class="breadcrumb">
 
-          <li><a href="/remotes?root=/home">home</a></li>
+          <li><a id="origin" href="/folders?root=/home">home</a></li>
 
-          <li><a href="/remotes?root=/home/harlanaubuchon">harlanaubuchon</a></li>
+          <li><a id="origin" href="/folders?root=/home/harlanaubuchon">harlanaubuchon</a></li>
 
           <li class="active">x</li>
 
@@ -306,16 +302,14 @@ minds_panel_group = """
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                  <a class="panel-title" data-toggle="collapse" data-parent="#panel-minds" href="#panel-element-new_mind">New Mind</a>
-                            </div>
-                            <div id="panel-element-new_mind" class="panel-collapse collapse">
+                            </div><!-- panel-heading -->
+                            <div id="panel-element-new_mind" class="panel-collapse collapse in">
                                 <div class="panel-body">
-
-
                                     <form class="form-horizontal" method="POST" id="new_mind">
                                         <fieldset>
                                             <div class="row clearfix">
                                                 <div class="col-md-6 column">
-                                                    <div class="row clearfix">
+                                                    <div class="row clearfix" id="new_mind_orig">
                                                         <h4>
                                                             Step 1: &nbsp;&nbsp;Choose a folder for Minder to mind below.
                                                         </h4>
@@ -325,45 +319,47 @@ minds_panel_group = """
                                                                 <input type="text" class="form-control" id="origintext" name="origin" value="">
                                                             </div>
                                                         </div>
-
-                                                        <a id="origin" href="folders">Click here to browse folders.</a>
-                                                        <div id="originfolder"></div>
-
-                                                    </div>
-                                                    <div class="row clearfix">
+                                                        <div class="row clearfix" id="originfolder">
+                                                            <a id="origin" href="folders">Click here to browse folders.</a>
+                                                        </div>
+                                                    </div><!-- row clearfix -->
+                                                    
+                                                    <div class="row clearfix" id="new_mind_dest">
                                                         <h4>
                                                         Step 2: &nbsp;&nbsp;Choose a folder for Minder to move your files to.
                                                         </h4>
                                                         <div class="form-group">
                                                             <label for="text" class="col-sm-2 control-label">Destination</label>
                                                             <div class="col-sm-8 input-group">
-                                                                <input type="text" class="form-control" id="text" name="destination" value="">
+                                                                <input type="text" class="form-control" id="destinationtext" name="destination" value="">
                                                             </div>
                                                         </div>
-
-                                                        <a id="destination" href="folders">Click here to browse folders.</a>
-                                                        <div id="destinationfolder"></div>
-
-                                                    </div>
-                                                </div>
+                                                        <div class="row clearfix" id="destinationfolder">
+                                                            <a id="origin" href="folders">Click here to browse folders.</a>
+                                                        </div>
+                                                    </div><!-- row clearfix -->
+                                                </div><!-- col-md-6 column -->
                                                 <div class="col-md-6 column">
-                                                    <h4>
-                                                    Step 3: &nbsp;&nbsp;Choose a Name for your new Mind.
-                                                    </h4>
-                                                    <form class="form-horizontal" role="form">
+                                                    <div class="row clearfix">
+                                                        <h4>
+                                                        Step 3: &nbsp;&nbsp;Choose a Name for your new Mind.
+                                                        </h4>
+
                                                         <div class="form-group">
-                                                            <label for="text" class="col-sm-4 control-label">Name of Mind</label>
-                                                            <div class="col-sm-6 input-group">
+                                                            <label for="text" class="col-sm-2 control-label">Name of Mind</label>
+                                                            <div class="col-sm-8 input-group">
                                                                 <input type="text" class="form-control" id="text" name="name_of_mind" value="">
                                                                 <span class="help-block">Name containing no spaces and no special characters</span>
                                                             </div>
                                                         </div>
+                                                    </div><!-- row clearfix -->
+                                                    <div class="row clearfix">
                                                         <h4>
                                                             Step 4: &nbsp;&nbsp;Enter one or more files extensions to Mind.
                                                         </h4>
                                                         <div class="form-group">
-                                                            <label for="text" class="col-sm-4 control-label">File Extensions</label>
-                                                            <div class="col-sm-6 input-group">
+                                                            <label for="text" class="col-sm-2 control-label">File Extensions</label>
+                                                            <div class="col-sm-8 input-group">
                                                                 <input type="text" class="form-control" id="text" name="file_extensions_list" value="">
                                                                 <span class="help-block">Comma seperated list of file extensions (e.g., .jpg, .png)</span>
 
@@ -375,21 +371,21 @@ minds_panel_group = """
                                                                 <button class="btn btn-danger" type="reset" name="section" value="reset">Cancel</button>
                                                             </div>
                                                         </div>
-                                                    </form>
-                                                </div>
-                                            </div>
+                                                    </div><!-- row clearfix -->
+                                                </div><!-- col-md-6 column -->
+                                            </div><!-- row clearfix -->
                                         </fieldset>
                                     </form>
-                                </div>
-                            </div>
-                        </div>
+                                </div><!-- panel-body -->
+                            </div><!-- panel-element-new_mind -->
+                        </div><!-- panel panel-default -->
 
                         ${panels}
 
-                    </div>
-                </div>
-            </div>
-        </div><!-- container -->
+                    </div><!-- panel-group -->
+                </div><!-- col-md-12 column -->
+            </div><!-- row clearfix -->
+        </div><!-- container theme-showcase -->
         """
 
 html_404 = """
@@ -438,8 +434,6 @@ html_404 = """
                     <li><a href="home">Home</a></li>
 
                     <li class="active"><a href="minds">.Minds</a></li>
-
-                    <li><a href="remotes">Remotes</a></li>
 
                     <li><a href="settings">Settings</a></li>
                 </ul>

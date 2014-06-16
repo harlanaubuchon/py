@@ -69,6 +69,7 @@ def mind(mind_path, refresh=False):
 
 
 def recollect(minds_dict=None):
+    minds_json = None
     if os.path.isfile(MINDS_FILE):
         minds_section_dict = _read_mind_palace(MINDS_FILE)
     else:
@@ -77,8 +78,10 @@ def recollect(minds_dict=None):
     if isinstance(minds_dict, dict):
 
         if 'delete' in minds_dict:
-            deleted_mind = minds_section_dict.pop(minds_dict['delete'])
-            logging.info('%s-MINDER        - Delete Mind - %s' % deleted_mind)
+            # TODO Fix this, should remove the dict and delete the file
+            deleted_mind = minds_section_dict.pop(minds_dict.pop('delete'))
+            minds_json = _write_mind_palace(MINDS_FILE, minds_section_dict)
+            logging.info('%s-MINDER        - Delete Mind - %s' % (mind_time, deleted_mind))
 
         if 'new_mind' in minds_dict:
             new_mind = minds_dict['new_mind']
@@ -88,8 +91,8 @@ def recollect(minds_dict=None):
                 "file_extensions_list": new_mind['file_extensions_list']
             }
 
-        else:
-            minds_section_dict[minds_dict.keys()[0]] = minds_dict.values()[0]
+        if 'new_mind' not in minds_dict and 'delete' not in minds_dict:
+            minds_section_dict.update(minds_dict)
 
         minds_json = _write_mind_palace(MINDS_FILE, minds_section_dict)
 
@@ -220,8 +223,9 @@ def _write_mind_palace(mind_path, mind_palace):
         with open(mind_path, 'w') as write_handle:
             json_dir = je.encode(mind_palace)
             write_handle.write(json_dir)
-    except:
-        raise
+
+    except Exception, e:
+        logging.exception(e)
 
     return mind_palace
 
@@ -232,9 +236,13 @@ def _read_mind_palace(mind_path):
     try:
         with open(mind_path) as read_handle:
             json_string = read_handle.read()
-            json_dir = jd.decode(json_string)
-    except:
-        raise
+            try:
+                json_dir = jd.decode(json_string)
+            except:
+                json_dir = {}
+
+    except Exception, e:
+        logging.exception(e)
 
     return json_dir
 

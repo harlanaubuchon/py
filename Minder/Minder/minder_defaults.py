@@ -140,7 +140,7 @@ minds_panel = """
                     <div class="panel-heading">
                          <a class="panel-title" data-toggle="collapse" data-parent="#panel-${title}" href="#panel-element-${panel_id}">${section}</a>
                     </div>
-                    <div id="panel-element-${panel_id}" class="panel-collapse collapse">
+                    <div id="panel-element-${panel_id}" class="panel-collapse collapse${panel_active}">
                         <div class="panel-body">
 
 
@@ -169,7 +169,7 @@ settings_panel = """
                     <div class="panel-heading">
                          <a class="panel-title" data-toggle="collapse" data-parent="#panel-${title}" href="#panel-element-${panel_id}">${section}</a>
                     </div>
-                    <div id="panel-element-${panel_id}" class="panel-collapse collapse">
+                    <div id="panel-element-${panel_id}" class="panel-collapse collapse${panel_active}">
                         <div class="panel-body">
 
 
@@ -271,26 +271,35 @@ breadcrumb_active = """
           <li class="active">${name}</li>
 """
 
-breadcrumb_list = """
-      <ol class="breadcrumb">
+#  Alert types: [success, info, warning, danger]
 
-          <li><a id="origin" href="/folders?root=/home">home</a></li>
+minder_message = {
+    "type": "",
+    "heading": "",
+    "severity": "",
+    "message": ""
+}
 
-          <li><a id="origin" href="/folders?root=/home/harlanaubuchon">harlanaubuchon</a></li>
-
-          <li class="active">x</li>
-
-      </ol>"""
+minder_messages = {
+    'alert_new_mind': {
+        "type": "info",
+        "heading": "You don't have any minds yet!",
+        "severity": "Info",
+        "message": " - You can start by creating one using the steps below."
+    }
+}
 
 form_alert = """
-<div class="alert alert-danger alert-dismissable">
+<div class="alert alert-${type} alert-dismissable">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
     <h4>
-        I'm terribly sorry, I can't do that for you...
+        ${heading}
     </h4>
-    <strong>Error</strong> - Please ensure all fields are filled correctly and try again.
+    <strong>${severity}</strong>${message}
 </div>
 """
+
+form_alert_messages = {"error": {"heading": "I'm terribly sorry, I can't do that for you..."}}
 
 minds_panel_group = """
        <div class="container theme-showcase" role="main">
@@ -303,12 +312,13 @@ minds_panel_group = """
                             <div class="panel-heading">
                                  <a class="panel-title" data-toggle="collapse" data-parent="#panel-minds" href="#panel-element-new_mind">New Mind</a>
                             </div><!-- panel-heading -->
-                            <div id="panel-element-new_mind" class="panel-collapse collapse in">
+                            <div id="panel-element-new_mind" class="panel-collapse collapse${panel_active}">
                                 <div class="panel-body">
                                     <form class="form-horizontal" method="POST" id="new_mind">
                                         <fieldset>
                                             <div class="row clearfix">
                                                 <div class="col-md-6 column">
+                                                    ${alert_new_mind}
                                                     <div class="row clearfix" id="new_mind_orig">
                                                         <h4>
                                                             Step 1: &nbsp;&nbsp;Choose a folder for Minder to mind below.
@@ -349,7 +359,7 @@ minds_panel_group = """
                                                             <label for="text" class="col-sm-2 control-label">Name of Mind</label>
                                                             <div class="col-sm-8 input-group">
                                                                 <input type="text" class="form-control" id="text" name="name_of_mind" value="">
-                                                                <span class="help-block">Name containing no spaces and no special characters</span>
+                                                                <span class="help-block">Name of Mind (containing no special characters)</span>
                                                             </div>
                                                         </div>
                                                     </div><!-- row clearfix -->

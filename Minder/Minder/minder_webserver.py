@@ -103,7 +103,8 @@ def route_request(u):
             'body': http_body
         }
 
-    except:
+    except Exception, e:
+        logging.exception(e)
         h_response = {
             'code': 404,
             'type': 'text/html',
@@ -112,17 +113,34 @@ def route_request(u):
 
     return h_response
 
+def minder_messages(message_dict):
+    mm = Template(md.form_alert)
+    if message_dict:
+        minder_message = mm.substitute(message_dict)
+    else:
+        minder_message = ''
+
+    return minder_message
+
 
 def expand_sections(url_path, sections_dict=None):
 
     panel_group = None
     panel_template = None
     config_uom = md.CONFIG_UOM
-
+    mm = {
+        'alert_new_mind': '',
+        'panel_active': ''
+    }
     if url_path == 'minds':
         sections_dict = mc.read_minder_settings(minds.recollect())
         panel_group = md.minds_panel_group
         panel_template = md.minds_panel
+        if len(sections_dict['sections']) < 1:
+            mm = {
+                'alert_new_mind': minder_messages(md.minder_messages['alert_new_mind']),
+                'panel_active': ' in'
+            }
 
     if url_path == 'settings':
         sections_dict = mc.read_minder_settings(mc.minderconfig())
@@ -144,8 +162,12 @@ def expand_sections(url_path, sections_dict=None):
             "title": url_path,
             "section": section['name'],
             "form_groups": "",
-            "panel_id": panel_id
+            "panel_id": panel_id,
+            "panel_active": ''
         }
+
+        if panel_id == 0:
+            form_builder['panel_active'] = ' in'
 
         for i in section['items']:
             select_options = ""
@@ -174,7 +196,12 @@ def expand_sections(url_path, sections_dict=None):
 
         section_html += st.substitute(form_builder)
 
-    final_html += pt.substitute({'title': url_path, 'panels': section_html})
+    panel_html = {
+        'title': url_path,
+        'panels': section_html
+    }
+    panel_html.update(mm)
+    final_html += pt.substitute(panel_html)
 
     return final_html
 
@@ -310,32 +337,47 @@ class MinderWebApp(BaseHTTPServer.BaseHTTPRequestHandler):
         param_dict = {}
         p_section = None
 
-        for i in post_params:
-            parsed_i = urllib.unquote(i)
-            parsed_i = parsed_i.replace('+', ' ')
-            param_dict[parsed_i.split('=')[0]] = parsed_i.split('=')[1]
+        try:
+            for i in post_params:
+                parsed_i = urllib.unquote(i)
+                parsed_i = parsed_i.replace('+', ' ')
+                param_dict[parsed_i.split('=')[0]] = parsed_i.split('=')[1]
 
-        if 'section' in param_dict:
-            p_section = {param_dict.pop('section'): param_dict}
+            if 'section' in param_dict:
+                p_section = {param_dict.pop('section'): param_dict}
 
-        if 'delete' in param_dict:
-            p_section = {'delete': param_dict['delete']}
+            if 'delete' in param_dict:
+                p_section = {'delete': param_dict['delete']}
 
-        if u.path == 'minds':
-            minds.recollect(p_section)
-            m = route_request(u)
-            self.send_response(m['code'])
-            self.send_header("Content-type", m['type'])
+            if u.path == 'minds':
+                minds.recollect(p_section)
+                s = u._replace(query='')
+                m = route_request(s)
+                self.send_response(m['code'])
+                self.send_header("Content-type", m['type'])
+                self.end_headers()
+                self.wfile.write(m['body'])
+
+            if u.path == 'settings':
+                mc.minderconfig(p_section, update=True)
+                s = route_request(u)
+                self.send_response(s['code'])
+                self.send_header("Content-type", s['type'])
+                self.end_headers()
+                self.wfile.write(s['body'])
+
+        except Exception, e:
+            logging.exception(e)
+            e = {
+                'code': 404,
+                'type': 'text/html',
+                'body': md.html_404
+            }
+            self.send_response(e['code'])
+            self.send_header("Content-type", e['type'])
             self.end_headers()
-            self.wfile.write(m['body'])
-
-        if u.path == 'settings':
-            mc.minderconfig(p_section, update=True)
-            s = route_request(u)
-            self.send_response(s['code'])
-            self.send_header("Content-type", s['type'])
-            self.end_headers()
-            self.wfile.write(s['body'])
+            self.wfile.write(e['body'])
+            raise
 
 
 if __name__ == '__main__':

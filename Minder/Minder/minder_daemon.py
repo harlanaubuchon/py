@@ -9,9 +9,11 @@ import minds
 from datetime import datetime
 import time
 import hashlib
+import collections
 import logging
 
 WAIT_TIME = eval(mc.minderconfig()['Settings']['mind_time_minutes'])
+DIR_DEPTH = eval(mc.minderconfig()['System']['directory_listing_depth_number'])
 LOG_HOME = os.path.join(mc.MINDER_HOME, 'logs', 'minder.log')
 M_CONFIG = mc.minderconfig()
 
@@ -34,12 +36,20 @@ def mind_daemon():
             ext_list = minds_config[key]['file_extensions_list'].replace(' ', '').split(',')
             search_folder = key.split('@')[1]
             dest_folder = minds_config[key]['destination']
+            f_cnt = collections.Counter()
+            minds.mind(dest_folder)
+            logging.info('%s-MINDER DAEMON - Setting up Destination Directory %s.' % (mind_time, dest_folder))
 
             if os.path.isdir(search_folder):
+                m = minds.mind(search_folder)
+                logging.info('%s-MINDER DAEMON - Analyzing Directory %s.' % (mind_time, search_folder))
                 for file_ext in ext_list:
                     l = [files for files in os.listdir(search_folder) if files.endswith(file_ext)]
                     for i in l:
                         file_list.append(os.path.join(search_folder, i))
+
+                    for i in m['files']:
+                        f_cnt[i['name'].split('.')[-1]] += 1
 
                 try:
                     for target in file_list:
@@ -82,8 +92,8 @@ def mind_daemon():
                                         mind_time, target, rename_file
                                     ))
 
-                except:
-                    raise
+                except Exception, e:
+                    logging.exception(e)
 
             else:
                 logging.info('%s-MINDER DAEMON - No Directory %s, this is a trick...' % (mind_time, search_folder))

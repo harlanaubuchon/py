@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# csvreader.py
+# reprizent.py
 # Author: Harlan AuBuchon
 # https://github.com/harlanaubuchon/
 
